@@ -1,0 +1,139 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+@import url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonnu-2021.05/GmarketSans.css');
+@import url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonnu-2021.05/KoPubWorldBatang.css');
+@import url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonnu-2021.05/BareunBatang.css');
+@import url('https://cdn.jsdelivr.net/gh/webfontworld/bareun/BareunBatang.css');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  --font-serif: "Bareun Batang", "BareunBatang", "KoPubWorld Batang", "KoPubBatang", "KoPub Batang", "Noto Serif KR", Georgia, serif;
+  --font-gmarket: "GmarketSansBold", "GmarketSansMedium", "Gmarket Sans", sans-serif;
+  --font-pretendard: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-kopub: "KoPubWorld Batang", "KoPubBatang", "KoPub Batang", "Noto Serif KR", Georgia, serif;
+  --font-bareun-batang: "Bareun Batang", "BareunBatang", "KoPubWorld Batang", "KoPubBatang", "Nanum Myeongjo", Batang, serif;
+}
+
+/* Base custom styles using Pretendard font family across UI elements */
+html, body, button, input, select, textarea {
+  font-family: var(--font-pretendard);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Font utility classes for exact typography specifications */
+.font-gmarket {
+  font-family: "GmarketSansBold", "GmarketSansMedium", "Gmarket Sans", sans-serif !important;
+}
+
+.font-pretendard {
+  font-family: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important;
+}
+
+.font-kopub {
+  font-family: "KoPubWorld Batang", "KoPubBatang", "KoPub Batang", "Noto Serif KR", Georgia, serif !important;
+}
+
+.font-bareun-batang, .font-batang {
+  font-family: "Bareun Batang", "BareunBatang", "KoPubWorld Batang", "KoPubBatang", "Nanum Myeongjo", "Noto Serif KR", Batang, serif !important;
+}
+
+/* Print-quality Article formatting styles (CMS rich text output styling) */
+.markdown-body h2 {
+  font-family: var(--font-pretendard);
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #111827;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  border-left: none;
+  padding-left: 0;
+}
+
+.markdown-body p {
+  font-family: var(--font-kopub);
+  font-size: 17px;
+  margin-bottom: 1.5rem;
+  line-height: 1.7;
+  color: #1a1a1a;
+  text-align: justify;
+  word-break: break-all;
+}
+
+.markdown-body blockquote {
+  font-family: var(--font-kopub);
+  font-weight: 500;
+  font-size: 1.05rem;
+  border-left: none;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 0;
+  background-color: transparent;
+  color: #374151;
+  margin: 2rem 0;
+  text-align: center;
+  border-radius: 0;
+}
+
+.markdown-body ul, .markdown-body ol {
+  margin-top: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding-left: 1.25rem;
+  list-style-type: disc;
+}
+
+.markdown-body li {
+  margin-bottom: 0.4rem;
+  color: #374151;
+  line-height: 1.75;
+}
+
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.825rem;
+  text-align: left;
+}
+
+.markdown-body th {
+  background-color: #f9fafb;
+  font-weight: 700;
+  color: #111827;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.markdown-body td {
+  padding: 0.5rem 0.8rem;
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151;
+}
+
+.markdown-body figure {
+  margin: 1.75rem 0;
+  text-align: center;
+}
+
+.markdown-body figcaption {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 0.5rem;
+}
+
+/* Custom fade animations */
+.animate-spin-slow {
+  animation: spin 8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

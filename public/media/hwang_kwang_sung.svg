@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 480" width="400" height="480">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4a5056"/>
+      <stop offset="50%" stop-color="#3c4146"/>
+      <stop offset="100%" stop-color="#2d3135"/>
+    </linearGradient>
+    <radialGradient id="faceShade" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#ffdfd0"/>
+      <stop offset="70%" stop-color="#f5ccb8"/>
+      <stop offset="100%" stop-color="#e8b8a0"/>
+    </radialGradient>
+    <linearGradient id="sweaterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#222225"/>
+      <stop offset="100%" stop-color="#121214"/>
+    </linearGradient>
+    <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2c2c30"/>
+      <stop offset="60%" stop-color="#18181b"/>
+      <stop offset="100%" stop-color="#0a0a0c"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="480" fill="url(#bgGrad)"/>
+
+  <!-- Subtle Studio Light Accent -->
+  <circle cx="280" cy="180" r="160" fill="#ffffff" opacity="0.04"/>
+
+  <!-- Torso & Shoulders -->
+  <!-- Black Sweater -->
+  <path d="M 80 480 L 110 330 Q 140 310 200 310 Q 260 310 290 330 L 320 480 Z" fill="url(#sweaterGrad)"/>
+  
+  <!-- White Shirt Collar showing beneath sweater -->
+  <path d="M 160 280 L 180 325 L 200 330 L 220 325 L 240 280 Q 200 295 160 280 Z" fill="#ffffff"/>
+  <path d="M 168 282 L 185 320 L 200 292 L 215 320 L 232 282 Z" fill="#f0f2f5"/>
+
+  <!-- Sweater Neckline -->
+  <path d="M 150 285 C 160 330, 240 330, 250 285 C 240 315, 160 315, 150 285 Z" fill="#18181b"/>
+
+  <!-- Neck -->
+  <path d="M 165 240 L 165 290 Q 200 300 235 290 L 235 240 Z" fill="#ebd0c0"/>
+  <!-- Neck shadow -->
+  <path d="M 165 240 Q 200 260 235 240 Q 200 280 165 240 Z" fill="#d9b19c" opacity="0.6"/>
+
+  <!-- Ears -->
+  <ellipse cx="128" cy="195" rx="14" ry="22" fill="#ecc1ab"/>
+  <ellipse cx="272" cy="195" rx="14" ry="22" fill="#ecc1ab"/>
+  <ellipse cx="129" cy="195" rx="8" ry="14" fill="#d4a38c"/>
+  <ellipse cx="271" cy="195" rx="8" ry="14" fill="#d4a38c"/>
+
+  <!-- Face Head Oval -->
+  <path d="M 134 160 Q 130 220 152 250 Q 200 285 248 250 Q 270 220 266 160 Q 260 110 200 105 Q 140 110 134 160 Z" fill="url(#faceShade)"/>
+
+  <!-- Cheeks / Contour -->
+  <path d="M 140 180 Q 135 220 155 245 Q 200 270 245 245 Q 265 220 260 180 Z" fill="#f0beaa" opacity="0.2"/>
+
+  <!-- Eyes -->
+  <!-- Left Eye -->
+  <g transform="translate(160, 178)">
+    <path d="M -14 0 Q 0 -8 14 0 Q 0 8 -14 0 Z" fill="#ffffff"/>
+    <circle cx="0" cy="0" r="6" fill="#2b2320"/>
+    <circle cx="-2" cy="-2" r="2" fill="#ffffff"/>
+    <path d="M -16 -4 Q 0 -12 16 -3" stroke="#2a1f1b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  </g>
+  <!-- Right Eye -->
+  <g transform="translate(240, 178)">
+    <path d="M -14 0 Q 0 -8 14 0 Q 0 8 -14 0 Z" fill="#ffffff"/>
+    <circle cx="0" cy="0" r="6" fill="#2b2320"/>
+    <circle cx="-2" cy="-2" r="2" fill="#ffffff"/>
+    <path d="M -16 -3 Q 0 -12 16 -4" stroke="#2a1f1b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- Eyebrows -->
+  <path d="M 142 165 Q 160 158 178 165" stroke="#1c1917" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M 222 165 Q 240 158 258 165" stroke="#1c1917" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+  <!-- Nose -->
+  <path d="M 200 170 L 202 205 Q 200 212 194 210 Q 200 215 206 210" stroke="#ca9881" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Gentle Smile -->
+  <path d="M 172 232 Q 200 246 228 232" stroke="#b05f52" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 180 234 Q 200 242 220 234" fill="#ffffff" opacity="0.9"/>
+
+  <!-- Styled Hair (Dark, left-parted, neat modern cut) -->
+  <path d="M 126 165 C 120 130, 140 85, 200 85 C 265 85, 280 130, 274 165 C 278 140, 270 100, 240 92 C 200 88, 170 100, 150 115 C 135 128, 128 145, 126 165 Z" fill="url(#hairGrad)"/>
+  <path d="M 130 150 Q 145 110 200 100 Q 255 105 270 150 C 262 120, 240 95, 200 95 C 160 95, 138 120, 130 150 Z" fill="#3a3a40"/>
+  <!-- Bangs / Forehead Hair strands -->
+  <path d="M 132 145 Q 155 125 185 130 Q 165 140 145 155 Z" fill="url(#hairGrad)"/>
+  <path d="M 180 120 Q 220 115 268 142 Q 240 130 200 125 Z" fill="url(#hairGrad)"/>
+
+  <!-- Frame Highlight / Professional Border -->
+  <rect x="2" y="2" width="396" height="476" fill="none" stroke="#60666d" stroke-width="2" opacity="0.3"/>
+</svg>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>한국AI교육일보 - 인터넷 기사 상세 페이지 시안</title>
+  <style>
+    /* 웹 폰트 로드 (@import 사용) */
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+    @import url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonnu-2021.05/GmarketSans.css');
+    @import url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonnu-2021.05/KoPubWorldBatang.css');
+
+    /* CSS Reset 및 기본 설정 */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 반응형 레이아웃 중앙 정렬 (최대 너비 800px) */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      min-height: 100vh;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 1. 헤더 영역 */
+    header {
+      border-b: 2px solid #112443;
+      padding: 24px 20px 16px 20px;
+      text-align: center;
+      background-color: #ffffff;
+    }
+
+    /* 최상단 매체명 헤더 로고: Gmarket Sans, Bold, 28px, 진한 네이비색 (#112443) */
+    .header-logo {
+      font-family: 'GmarketSansBold', 'Gmarket Sans', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: #112443;
+      text-decoration: none;
+      letter-spacing: -0.5px;
+      display: inline-block;
+    }
+
+    /* 2. 상단 카테고리 메뉴 영역 */
+    nav {
+      background-color: #112443;
+      border-bottom: 1px solid #0f172a;
+    }
+
+    .category-menu {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* 상단 카테고리 메뉴: Pretendard, Medium, 16px, 가로 정렬 */
+    .category-menu li a {
+      display: block;
+      padding: 12px 20px;
+      font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
+      font-weight: 500;
+      font-size: 16px;
+      color: #ffffff;
+      text-decoration: none;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .category-menu li a:hover,
+    .category-menu li a.active {
+      background-color: #1e3a8a;
+      color: #fbbf24;
+    }
+
+    /* 3. 메인 콘텐츠 영역 */
+    main {
+      padding: 36px 24px 48px 24px;
+    }
+
+    /* 기사 카테고리 태그 */
+    .article-category {
+      font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #2563eb;
+      margin-bottom: 8px;
+    }
+
+    /* 기사 제목: Pretendard, Bold, 32px */
+    .article-title {
+      font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.35;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+    }
+
+    /* 메타 정보 (작성자명, 입력 날짜) */
+    .article-meta {
+      font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
+      font-size: 13px;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e2e8f0;
+      margin-bottom: 28px;
+    }
+
+    .article-meta .author {
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .article-meta .divider {
+      color: #cbd5e1;
+    }
+
+    /* 대표 이미지 요소 */
+    .article-media {
+      margin-bottom: 32px;
+    }
+
+    .article-media img {
+      width: 100%;
+      height: auto;
+      border-radius: 4px;
+      display: block;
+    }
+
+    .article-media figcaption {
+      font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 8px;
+      text-align: left;
+    }
+
+    /* 기사 본문: KoPub Batang, Medium, 17px, 줄간격 1.7 */
+    .article-body {
+      font-family: 'KoPubWorld Batang', 'KoPub Batang', 'Noto Serif KR', serif;
+      font-weight: 500;
+      font-size: 17px;
+      line-height: 1.7;
+      color: #1e293b;
+      text-align: justify;
+      word-break: keep-all;
+    }
+
+    .article-body p {
+      margin-bottom: 24px;
+      text-indent: 4px;
+    }
+
+    /* 저작권 문구 */
+    .copyright {
+      font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 40px;
+      padding-top: 16px;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    /* 4. 푸터 영역 */
+    footer {
+      background-color: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      padding: 24px;
+      font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    footer strong {
+      color: #334155;
+    }
+
+    /* 모바일 반응형 처리 */
+    @media (max-width: 640px) {
+      .header-logo {
+        font-size: 24px;
+      }
+
+      .category-menu li a {
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+
+      main {
+        padding: 24px 16px;
+      }
+
+      .article-title {
+        font-size: 24px;
+      }
+
+      .article-body {
+        font-size: 16px;
+        line-height: 1.7;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- 최상단 매체명 (헤더 로고) -->
+    <header>
+      <a href="#" class="header-logo">한국AI교육일보</a>
+    </header>
+
+    <!-- 상단 카테고리 메뉴 -->
+    <nav>
+      <ul class="category-menu">
+        <li><a href="#" class="active">홈</a></li>
+        <li><a href="#">AI 정책</a></li>
+        <li><a href="#">에듀테크</a></li>
+        <li><a href="#">교육 현장</a></li>
+        <li><a href="#">오피니언</a></li>
+      </ul>
+    </nav>
+
+    <!-- 메인 기사 상세 영역 -->
+    <main>
+      <div class="article-category">교육 현장</div>
+      <!-- 기사 제목 -->
+      <h1 class="article-title">AI 맞춤형 학습, 공교육 혁신을 이끈다</h1>
+
+      <!-- 작성자명 및 입력 날짜 -->
+      <div class="article-meta">
+        <span class="author">AI교육부 김기자</span>
+        <span class="divider">|</span>
+        <span class="date">입력 : 2026. 07. 27. 09:00</span>
+      </div>
+
+      <!-- 기사 대표 이미지 -->
+      <figure class="article-media">
+        <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=800" alt="AI 맞춤형 학습 스마트 교실 현장" />
+        <figcaption>▲ 서울의 한 스마트 교실에서 교사와 학생들이 AI 맞춤형 학습 플랫폼을 활용해 수업에 참여하고 있다. [사진=한국AI교육일보 DB]</figcaption>
+      </figure>
+
+      <!-- 기사 본문 (KoPub Batang, Medium, 17px, 줄간격 1.7) -->
+      <article class="article-body">
+        <p>
+          인공지능(AI)을 활용한 맞춤형 교육이 전국 초·중·고등학교 현장에 성공적으로 안착하며 공교육의 새로운 변화를 이끌어내고 있다. 학생 개인별 학업 성취도와 학습 속도에 맞춘 AI 튜터링 시스템이 도입되면서, 기존의 일률적인 강의식 수업에서 벗어나 개별화된 진도 관리와 정밀 진단 학습이 구현되고 있다.
+        </p>
+        <p>
+          특히 현장 교사들은 AI 보조 교사를 활용해 개별 학생의 취약점을 실시간으로 파악하고, 이에 맞춘 수준별 피드백과 소그룹 보충 수업에 진력할 수 있게 되었다. 이로 인해 학생들의 학습 몰입도와 자발적 참여도가 크게 향상되었으며, 기초 학력 미달 학생 비율이 현저히 감소하는 유의미한 성과를 거두고 있다.
+        </p>
+        <p>
+          전문가들은 AI 기술의 정착이 교육 격차 해소와 미래 디지털 인재 양성의 핵심 동력이 될 것으로 기대하고 있다. 교육 당국은 향후 교원 대상 AI 리터러시 연수를 지속적으로 확대하고, 안전한 학습 데이터 관리 및 개인정보 보호 인프라를 한층 강화하여 공교육의 질적 도약을 이어갈 방침이다.
+        </p>
+      </article>
+
+      <!-- 저작권 표기 -->
+      <div class="copyright">
+        [저작권자 ⓒ 한국AI교육일보 무단전재 및 재배포 금지]
+      </div>
+    </main>
+
+    <!-- 하단 푸터 -->
+    <footer>
+      <p><strong>한국AI교육일보</strong> | 등록번호 : | 발행·편집인 : 황광성</p>
+      <p>주소 : 서울특별시 금천구 가산디지털2로 53 한라시그마밸리 1102호 ~ 1104호 | 전화 : 02-6443-4222</p>
+      <p>Copyright ⓒ 한국AI교육일보 All rights reserved.</p>
+    </footer>
+  </div>
+
+</body>
+</html>

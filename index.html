@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>한국AI교육일보 (KAEN News)</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  </head>
+  <body class="bg-[#f4f5f7] text-[#222222]">
+    <div id="root">
+      <!-- Instant First-Frame Newspaper UI (Zero-second initial render before React hydration) -->
+      <div style="min-height:100vh;display:flex;flex-direction:column;font-family:Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;background-color:#f4f5f7;color:#1e293b;">
+        <!-- Top Gov/Press Info Bar -->
+        <div style="background-color:#0f172a;color:#94a3b8;font-size:11px;padding:6px 16px;border-bottom:1px solid #1e293b;">
+          <div style="max-width:1280px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;">
+            <span>대한민국 AI 공교육 정론직필 · 등록번호: 서울 아 54829</span>
+            <span>2026년 9월 7일 월요일 · 판차: 전국 종합판</span>
+          </div>
+        </div>
+
+        <!-- Main Masthead -->
+        <header style="background-color:#ffffff;border-bottom:1px solid #e2e8f0;padding:24px 16px 20px;">
+          <div style="max-width:1280px;margin:0 auto;text-align:center;">
+            <h1 style="font-size:38px;font-weight:900;letter-spacing:-1.5px;color:#0f172a;margin:0;font-family:serif;">한국AI교육일보</h1>
+            <p style="font-size:11px;font-weight:700;letter-spacing:4px;color:#1d4ed8;margin:6px 0 0;text-transform:uppercase;">KOREA AI EDUCATION NEWS</p>
+          </div>
+        </header>
+
+        <!-- Main Navigation Bar -->
+        <nav style="background-color:#0f172a;color:#ffffff;font-size:14px;font-weight:700;border-bottom:3px solid #1d4ed8;">
+          <div style="max-width:1280px;margin:0 auto;display:flex;align-items:center;padding:0 16px;height:46px;gap:24px;">
+            <span style="background-color:#1d4ed8;color:#ffffff;padding:4px 12px;font-size:13px;font-weight:800;border-radius:2px;">홈</span>
+            <span style="color:#cbd5e1;">AI 정책·행정</span>
+            <span style="color:#cbd5e1;">AI 학교·교육</span>
+            <span style="color:#cbd5e1;">AI 산업·에듀테크</span>
+            <span style="color:#cbd5e1;">AI 리터러시·인재</span>
+            <span style="color:#cbd5e1;">오피니언·기획</span>
+          </div>
+        </nav>
+
+        <!-- Newspaper Headline Preview Placeholder -->
+        <main style="max-width:1280px;margin:16px auto;padding:0 16px;flex:1;width:100%;box-sizing:border-box;">
+          <div style="background:#ffffff;border:1px solid #e2e8f0;padding:20px;margin-bottom:16px;">
+            <div style="font-size:12px;font-weight:800;color:#1d4ed8;margin-bottom:8px;">[단독 종합 보도]</div>
+            <div style="font-size:24px;font-weight:800;color:#0f172a;line-height:1.4;">AI 시대 교원 역할의 대전환… 단순 지식 전달자에서 배움의 디자이너로</div>
+            <div style="font-size:14px;color:#64748b;margin-top:10px;line-height:1.6;">생성형 인공지능(AI) 기술의 고도화와 AI 디지털교과서 도입에 따라 교육 현장의 패러다임이 혁신되고 있습니다.</div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script>
+      // Clear any legacy Service Workers or caches that might keep showing old loading spinners
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) { reg.unregister(); }
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then(function(names) {
+          for (var name of names) caches.delete(name);
+        });
+      }
+    </script>
+    <script type="module" src="/src/main.tsx?v=20260907_v4"></script>
+  </body>
+</html>
+

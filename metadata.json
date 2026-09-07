@@ -1,0 +1,6 @@
+{
+  "name": "한국AI교육일보 (KAEN News)",
+  "description": "대한민국 대표 인공지능·미래교육 전문지 CMS 플랫폼 및 언론사 뉴스 웹사이트",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
