@@ -23,11 +23,11 @@ export default function ReportPage() {
     <main className="mx-auto max-w-4xl px-4 py-12">
       <p className="text-sm font-black tracking-[0.22em] text-brand-gold">REPORT</p>
       <h1 className="mt-2 text-4xl font-black text-brand-navy">기사제보</h1>
-      <p className="mt-5 text-lg leading-9 text-gray-700">에듀저널은 교육 현장의 변화, 제도 개선, 학습자 사례, 교육기관 운영 소식, 기사 오류와 정정 요청을 접수합니다.</p>
+      <p className="mt-5 text-lg leading-9 text-gray-700">한국AI교육신문은 교육 현장의 변화, 제도 개선, 학습자 사례, 교육기관 운영 소식, 기사 오류와 정정 요청을 접수합니다.</p>
 
       <section className="mt-8 rounded border border-brand-navy bg-white p-6 text-sm leading-7 text-gray-700">
         <h2 className="text-xl font-black text-brand-navy">제보 접수 이메일</h2>
-        <p className="mt-3">contact@edujournal.kr</p>
+        <p className="mt-3 font-black text-brand-navy">whomedia03@gmail.com</p>
         <p className="mt-2">메일 제목에 [기사제보]를 표시하고, 기사화 가능 여부를 확인할 수 있는 자료를 함께 보내 주세요.</p>
       </section>
 

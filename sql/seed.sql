@@ -1,5 +1,5 @@
-insert into site_settings (site_name, site_description, operator_name, business_name, representative_name, media_registration_status, contact_email, contact_phone)
-values ('생활경제저널', '생활경제, 지역상권, 교육, 시니어, 건강, 창업 현장의 브랜드와 사람을 기록하는 생활경제 전문 미디어입니다.', 'Algo Partners', '알고파트너스', '박예준', 'unregistered', 'contact@example.com', '000-0000-0000')
+insert into site_settings (site_name, site_description, operator_name, business_name, representative_name, business_registration_number, publisher_name, editor_name, youth_protection_manager, privacy_manager, address, media_registration_status, contact_email, contact_phone)
+values ('에듀저널', '평생교육, 자격증, 시니어 학습, 에듀테크, 교육기관 정보를 다루는 교육 전문 인터넷매체입니다.', '(주)후미디어', '(주)후미디어', '황광성', '119-86-25861', '황광성', '황광성', '황광성', '황광성', '서울특별시 금천구 가산디지털2로 53 (가산동) 한라시그마밸리 1102호 ~ 1104호', 'preparing', 'whomedia03@gmail.com', '02-6443-4222')
 on conflict do nothing;
 
 insert into categories (name, slug, description, sort_order) values

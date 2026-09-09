@@ -10,7 +10,7 @@ const required = [
 ];
 
 const review = [
-  ['교육 분야 관련성', '평생교육, 자격증, 시니어 학습, 에듀테크, 교육기관 운영 등 에듀저널 보도 분야와 관련성이 있어야 합니다.'],
+  ['교육 분야 관련성', 'AI 교육, 평생학습, 자격증, 에듀테크, 교육기관 운영 등 한국AI교육신문 보도 분야와 관련성이 있어야 합니다.'],
   ['사실 확인 가능성', '일정, 장소, 주최 기관, 참여 대상, 비용, 신청 방법 등 핵심 정보가 확인 가능해야 합니다.'],
   ['독자 유용성', '단순 홍보 문구보다 독자가 실제로 확인할 수 있는 조건, 절차, 변화, 활용 정보를 우선 검토합니다.'],
   ['편집권 기준', '접수된 자료는 편집 판단에 따라 제목, 표현, 구성, 게재 여부가 조정될 수 있습니다.']
@@ -21,11 +21,11 @@ export default function PressPage() {
     <main className="mx-auto max-w-4xl px-4 py-12">
       <p className="text-sm font-black tracking-[0.22em] text-brand-gold">PRESS RELEASE</p>
       <h1 className="mt-2 text-4xl font-black text-brand-navy">보도자료 접수</h1>
-      <p className="mt-5 text-lg leading-9 text-gray-700">에듀저널은 교육기관, 평생교육 과정, 자격증, 에듀테크, 시니어 학습 관련 보도자료를 접수합니다.</p>
+      <p className="mt-5 text-lg leading-9 text-gray-700">한국AI교육신문은 교육기관, AI 역량 교육, 평생학습, 자격증, 에듀테크 관련 보도자료를 접수합니다.</p>
 
       <section className="mt-8 rounded border border-brand-navy bg-white p-6 text-sm leading-7 text-gray-700">
         <h2 className="text-xl font-black text-brand-navy">접수 이메일</h2>
-        <p className="mt-3 font-bold text-gray-900">contact@edujournal.kr</p>
+        <p className="mt-3 font-bold text-brand-navy">whomedia03@gmail.com</p>
         <p className="mt-2">메일 제목에 [보도자료]를 표시하고, 원문 자료와 이미지 사용 가능 여부를 함께 보내 주세요.</p>
       </section>
 

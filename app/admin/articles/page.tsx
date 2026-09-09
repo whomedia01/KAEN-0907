@@ -20,18 +20,23 @@ export default async function AdminArticlesPage() {
       <div className="mt-8 overflow-hidden rounded-2xl border">
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-50 text-xs uppercase tracking-[0.2em] text-slate-500">
-            <tr><th className="p-4">상태</th><th className="p-4">제목</th><th className="p-4">기자</th><th className="p-4">발행일</th><th className="p-4">공개 URL</th></tr>
+            <tr><th className="p-4">상태</th><th className="p-4">제목</th><th className="p-4">기자</th><th className="p-4">발행일</th><th className="p-4">공개 URL</th><th className="p-4">관리</th></tr>
           </thead>
           <tbody>
             {rows.length === 0 ? (
-              <tr><td colSpan={5} className="p-8 text-center text-slate-500">아직 DB에 저장된 기사가 없습니다. 새 기사를 작성하면 이곳에 표시됩니다.</td></tr>
+              <tr><td colSpan={6} className="p-8 text-center text-slate-500">아직 DB에 저장된 기사가 없습니다. 새 기사를 작성하면 이곳에 표시됩니다.</td></tr>
             ) : rows.map((article: any) => (
               <tr key={article.id} className="border-t">
                 <td className="p-4"><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black">{article.status}</span></td>
                 <td className="p-4 font-bold text-slate-900">{article.title}</td>
-                <td className="p-4 text-slate-600">{article.author_name ?? '에듀저널 편집부'}</td>
+                <td className="p-4 text-slate-600">{article.author_name ?? '한국AI교육신문 편집부'}</td>
                 <td className="p-4 text-slate-600">{article.published_at ? new Date(article.published_at).toLocaleDateString('ko-KR') : '-'}</td>
                 <td className="p-4">{article.status === 'published' ? <Link href={`/articles/${article.slug}`} className="font-black text-brand-navy">보기</Link> : <span className="text-slate-400">비공개</span>}</td>
+                <td className="p-4">
+                  <Link href={`/admin/articles/${article.id}/edit`} className="rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 px-3 py-1.5 text-xs font-bold text-slate-700 transition-colors">
+                    수정/윤리검사
+                  </Link>
+                </td>
               </tr>
             ))}
           </tbody>

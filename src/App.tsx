@@ -108,8 +108,8 @@ export default function App() {
         };
       }
       return {
-        title: `${siteName} - 대한민국 대표 AI 공교육 정론직필`,
-        description: "대한민국 대표 인공지능·미래교육 전문지 한국AI교육신문 CMS 플랫폼 및 정론직필 언론사 뉴스 웹사이트",
+        title: `${siteName} - 인공지능 교육 전문 신문`,
+        description: "인공지능·미래교육 전문지 한국AI교육신문 뉴스 웹사이트",
         ogType: "website" as const
       };
     }

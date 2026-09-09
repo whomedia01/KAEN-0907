@@ -30,11 +30,11 @@ function body(topic: string, image: string) {
 
 교육기관도 이 변화에 맞춰 과정 소개 방식을 다시 정비하고 있다. 수강료와 수료증만 안내하는 방식으로는 충분하지 않으며, 강사 전문성, 학습 목표, 상담 기준, 환불 안내, 사후 관리 체계를 함께 제시해야 신뢰를 얻을 수 있다는 분석이다.
 
-![${topic} 관련 교육 현장 자료사진.](${image} "에듀저널")
+![${topic} 관련 교육 현장 자료사진.](${image} "한국AI교육신문")
 
 전문가들은 평생교육 시장이 양적 확대에서 질적 검증 단계로 이동하고 있다고 본다. 온라인 교육과 원격 강의가 보편화되면서 누구나 교육 과정을 만들 수 있게 됐지만, 학습자는 더 이상 강의 수만으로 기관을 판단하지 않는다. 학습 경험과 운영 투명성이 함께 평가되는 구조가 강화되고 있다.
 
-에듀저널은 교육 정책과 자격증, 시니어 교육, 에듀테크, 교육기관 운영 사례를 지속적으로 기록하며 학습자에게 필요한 정보를 제공할 계획이다. 교육 콘텐츠를 단순 광고가 아니라 생활형 학습 정보로 정리하는 것이 교육 전문 매체의 중요한 역할이라는 판단이다.`;
+한국AI교육신문은 교육 정책과 자격증, 시니어 교육, 에듀테크, 교육기관 운영 사례를 지속적으로 기록하며 학습자에게 필요한 정보를 제공할 계획이다. 교육 콘텐츠를 단순 광고가 아니라 생활형 학습 정보로 정리하는 것이 교육 전문 매체의 중요한 역할이라는 판단이다.`;
 }
 
 export const originalArticleSeeds: OriginalArticleSeed[] = [
@@ -50,7 +50,7 @@ export const originalArticleSeeds: OriginalArticleSeed[] = [
     publishedAt: '2026-06-18T09:20:00+09:00',
     thumbnailUrl: classroom,
     imageCaption: '성인학습 관련 교육 현장 자료사진.',
-    imageSourceName: '에듀저널'
+    imageSourceName: '한국AI교육신문'
   },
   {
     id: 'edu-career-002',
@@ -64,7 +64,7 @@ export const originalArticleSeeds: OriginalArticleSeed[] = [
     publishedAt: '2026-06-17T11:10:00+09:00',
     thumbnailUrl: study,
     imageCaption: '직무교육과 자격증 학습 자료사진.',
-    imageSourceName: '에듀저널'
+    imageSourceName: '한국AI교육신문'
   },
   {
     id: 'edu-senior-003',
@@ -78,7 +78,7 @@ export const originalArticleSeeds: OriginalArticleSeed[] = [
     publishedAt: '2026-06-16T10:40:00+09:00',
     thumbnailUrl: senior,
     imageCaption: '시니어 교육 관련 자료사진.',
-    imageSourceName: '에듀저널'
+    imageSourceName: '한국AI교육신문'
   },
   {
     id: 'edu-ai-004',
@@ -92,7 +92,7 @@ export const originalArticleSeeds: OriginalArticleSeed[] = [
     publishedAt: '2026-06-15T14:00:00+09:00',
     thumbnailUrl: ai,
     imageCaption: 'AI와 에듀테크 관련 자료사진.',
-    imageSourceName: '에듀저널'
+    imageSourceName: '한국AI교육신문'
   },
   {
     id: 'edu-campus-005',
@@ -106,7 +106,7 @@ export const originalArticleSeeds: OriginalArticleSeed[] = [
     publishedAt: '2026-06-14T09:30:00+09:00',
     thumbnailUrl: campus,
     imageCaption: '교육기관 현장 관련 자료사진.',
-    imageSourceName: '에듀저널'
+    imageSourceName: '한국AI교육신문'
   },
   {
     id: 'edu-opinion-006',
@@ -120,6 +120,6 @@ export const originalArticleSeeds: OriginalArticleSeed[] = [
     publishedAt: '2026-06-13T15:20:00+09:00',
     thumbnailUrl: lecture,
     imageCaption: '강연과 학습 현장 자료사진.',
-    imageSourceName: '에듀저널'
+    imageSourceName: '한국AI교육신문'
   }
 ];

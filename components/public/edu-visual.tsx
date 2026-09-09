@@ -18,16 +18,16 @@ const palette: Record<string, string> = {
 };
 
 export function EduVisual({ category, title, className = '', compact = false }: EduVisualProps) {
-  const label = category || '에듀저널';
+  const label = category || '한국AI교육신문';
   const tone = palette[label] || 'bg-slate-50 text-slate-950 border-slate-200';
-  const displayTitle = title || '교육 전문 콘텐츠';
+  const displayTitle = title || 'AI 교육 전문 콘텐츠';
 
   return (
     <div className={`relative overflow-hidden border ${tone} ${className}`}>
       <div className="absolute right-3 top-3 h-12 w-12 rounded-full bg-white/70" />
       <div className="absolute bottom-3 left-3 h-10 w-10 rounded-full bg-white/60" />
       <div className={`${compact ? 'p-3' : 'p-5'} relative flex h-full min-h-[inherit] flex-col justify-between`}>
-        <p className="text-[10px] font-black uppercase tracking-[0.18em] opacity-70">EDU JOURNAL</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.18em] opacity-70">KOREA AI EDUCATION NEWS</p>
         <div>
           <p className={`${compact ? 'text-sm' : 'text-lg'} line-clamp-2 font-black leading-tight`}>{label}</p>
           <p className={`${compact ? 'hidden' : 'mt-2 line-clamp-2'} text-xs font-semibold leading-5 opacity-70`}>{displayTitle}</p>

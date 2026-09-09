@@ -57,10 +57,18 @@ export async function createArticle(formData: FormData): Promise<void> {
   const status = String(formData.get('status') ?? 'draft') as ArticleStatus;
   const articleType = String(formData.get('article_type') ?? 'normal') as ArticleType;
   const shouldCommitToGit = formData.get('commit_to_git') === 'on';
+  const authorName = String(formData.get('author_name') ?? '').trim() || '취재팀';
+  const content = String(formData.get('content') ?? '').trim();
   const now = new Date().toISOString();
 
-  if (!title || !slug) {
-    throw new Error('제목과 슬러그가 필요합니다.');
+  if (!title || title.length < 2) {
+    throw new Error('기사 제목을 최소 2자 이상 입력해야 합니다.');
+  }
+  if (!slug) {
+    throw new Error('기사 슬러그 생성을 위한 유효한 제목이 필요합니다.');
+  }
+  if (status === 'published' && (!content || content.length < 20)) {
+    throw new Error('기사 즉시 발행 시에는 최소 20자 이상의 본문 내용이 필요합니다.');
   }
 
   const { data: category } = await supabase
@@ -94,7 +102,7 @@ export async function createArticle(formData: FormData): Promise<void> {
     image_author: String(formData.get('image_author') ?? '').trim() || null,
     image_license: String(formData.get('image_license') ?? '').trim() || null,
     visual_mode: 'photo',
-    author_name: String(formData.get('author_name') ?? '').trim() || user.email || '에듀저널 편집부',
+    author_name: authorName || '한국AI교육신문 취재팀',
     is_sponsored: ['brand_interview', 'sponsored', 'advertorial'].includes(articleType),
     tags,
     source_urls: sourceUrls,

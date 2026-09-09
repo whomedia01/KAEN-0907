@@ -1,4 +1,5 @@
 import type { Article } from '@/types/database';
+import { getCuratedImageForArticle, type CuratedImage } from './curated-images';
 
 export type ArticleImageDisplay = {
   url: string;
@@ -12,7 +13,7 @@ export type ArticleImageDisplay = {
 const LOCAL_EDU_IMAGE = '/media/edu-lifelong.svg';
 
 const categoryLabels: Record<string, string> = {
-  'lifelong-education': '평생교육',
+  'lifelong-education': '평생교육·HRD',
   'career-dev': '자격증·자기계발',
   'senior-education': '시니어·실버교육',
   'edutech-ai': '에듀테크·AI',
@@ -23,34 +24,47 @@ const categoryLabels: Record<string, string> = {
   'press-release': '공지·보도'
 };
 
-function localImage(label: string): ArticleImageDisplay {
+export function getFallbackArticleImage(categorySlug?: string | null, categoryName?: string | null): ArticleImageDisplay {
+  const curated = getCuratedImageForArticle({
+    categorySlug: categorySlug ?? 'edutech-ai'
+  });
+
   return {
-    url: LOCAL_EDU_IMAGE,
-    caption: `▲ ${label} 관련 에듀저널 자료 이미지.`,
-    sourceName: '에듀저널',
-    license: '자체 제작',
+    url: curated.url || LOCAL_EDU_IMAGE,
+    caption: curated.caption,
+    sourceName: curated.sourceName,
+    license: curated.license,
     isFallback: true
   };
 }
 
-export function getFallbackArticleImage(categorySlug?: string | null, categoryName?: string | null): ArticleImageDisplay {
-  const label = (categorySlug && categoryLabels[categorySlug]) || categoryName || '교육 기사';
-  return localImage(label);
-}
-
 export function getArticleImageForDisplay(article: Article): ArticleImageDisplay {
-  const isLocal = article.thumbnail_url?.startsWith('/');
-  if (isLocal) {
-    const image: ArticleImageDisplay = {
-      url: article.thumbnail_url!,
-      caption: article.image_caption || `▲ ${article.title} 관련 에듀저널 자료 이미지.`,
-      sourceName: article.image_source_name || '에듀저널',
-      license: article.image_license || '자체 제작',
+  // If the article has an explicit valid thumbnail_url that is not placeholder
+  if (article.thumbnail_url && !article.thumbnail_url.includes('seed/edujournal')) {
+    return {
+      url: article.thumbnail_url,
+      caption: article.image_caption || `▲ ${article.title} 관련 한국AI교육신문 자료사진.`,
+      sourceName: article.image_source_name || '한국AI교육신문 취재팀',
+      license: article.image_license || '자체 취재 / 보도 저작권 준수',
+      sourceUrl: article.image_source_url || undefined,
       isFallback: false
     };
-    if (article.image_source_url) image.sourceUrl = article.image_source_url;
-    return image;
   }
 
-  return getFallbackArticleImage(article.categories?.slug, article.categories?.name);
+  // Content-matched curated image based on article category and title
+  const curated = getCuratedImageForArticle({
+    categorySlug: article.categories?.slug ?? undefined,
+    title: article.title,
+    articleId: article.id,
+    isBreaking: false
+  });
+
+  return {
+    url: curated.url,
+    caption: article.image_caption || curated.caption,
+    sourceName: article.image_source_name || curated.sourceName,
+    license: article.image_license || curated.license,
+    sourceUrl: curated.url,
+    isFallback: false
+  };
 }

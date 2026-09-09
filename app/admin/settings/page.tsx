@@ -29,6 +29,7 @@ export default async function AdminSettingsPage() {
         <label className="grid gap-2 text-sm font-bold md:col-span-2">주소<input name="address" defaultValue={settings.address ?? ''} className="rounded-xl border px-4 py-3" /></label>
         <label className="grid gap-2 text-sm font-bold">대표 이메일<input name="contact_email" defaultValue={settings.contact_email} className="rounded-xl border px-4 py-3" /></label>
         <label className="grid gap-2 text-sm font-bold">대표 전화<input name="contact_phone" defaultValue={settings.contact_phone} className="rounded-xl border px-4 py-3" /></label>
+        <label className="grid gap-2 text-sm font-bold">팩스 번호<input name="contact_fax" defaultValue={settings.contact_fax ?? ''} className="rounded-xl border px-4 py-3" /></label>
         <label className="grid gap-2 text-sm font-bold md:col-span-2">사이트 설명<textarea name="site_description" rows={4} defaultValue={settings.site_description} className="rounded-xl border px-4 py-3" /></label>
         <button className="md:col-span-2 rounded-2xl bg-brand-navy px-6 py-4 text-base font-black text-white">사이트 설정 저장</button>
       </form>

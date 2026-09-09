@@ -26,7 +26,7 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
     <main className="mx-auto max-w-5xl px-4 py-12">
       <p className="text-sm font-black tracking-[0.22em] text-brand-gold">ARTICLE SEARCH</p>
       <h1 className="mt-2 text-4xl font-black text-brand-navy">기사검색</h1>
-      <p className="mt-5 text-lg leading-9 text-gray-700">에듀저널에 게재된 교육 관련 기사를 제목, 요약, 본문 키워드 기준으로 확인할 수 있습니다.</p>
+      <p className="mt-5 text-lg leading-9 text-gray-700">한국AI교육신문에 게재된 교육 관련 기사를 제목, 요약, 본문 키워드 기준으로 확인할 수 있습니다.</p>
 
       <form className="mt-8 flex gap-2 border bg-white p-3" action="/search">
         <input name="q" defaultValue={query} placeholder="검색어를 입력하세요" className="min-w-0 flex-1 px-3 py-3 text-sm outline-none" />

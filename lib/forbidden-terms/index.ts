@@ -1,3 +1,5 @@
+import { FORBIDDEN_RULES } from '@/lib/ethics/forbidden-words';
+
 export const FORBIDDEN_TERMS = [
   '네이버 뉴스 노출 보장',
   '포털 뉴스 송출 보장',
@@ -21,5 +23,21 @@ export const FORBIDDEN_TERMS = [
 
 export function detectForbiddenTerms(text: string) {
   const normalized = text.replace(/\s+/g, ' ').trim();
-  return FORBIDDEN_TERMS.filter((term) => normalized.includes(term));
+  const legacyMatched = FORBIDDEN_TERMS.filter((term) => normalized.includes(term));
+  
+  const ruleMatched: string[] = [];
+  for (const rule of FORBIDDEN_RULES) {
+    if (typeof rule.pattern === 'string') {
+      if (normalized.includes(rule.pattern)) {
+        ruleMatched.push(`[${rule.categoryName}] ${rule.keyword}`);
+      }
+    } else {
+      if (rule.pattern.test(normalized)) {
+        ruleMatched.push(`[${rule.categoryName}] ${rule.keyword}`);
+      }
+    }
+  }
+
+  return Array.from(new Set([...legacyMatched, ...ruleMatched]));
 }
+

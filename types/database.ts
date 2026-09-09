@@ -23,6 +23,7 @@ export interface SiteSettings {
   address?: string | null;
   contact_email: string;
   contact_phone: string;
+  contact_fax?: string | null;
   logo_url?: string | null;
 }
 
@@ -54,6 +55,9 @@ export interface Article {
   image_license_url?: string | null;
   visual_mode?: ArticleVisualMode;
   author_name: string;
+  author_email?: string | null;
+  author_role?: string | null;
+  is_breaking?: boolean | null;
   client_id?: string | null;
   is_sponsored: boolean;
   sponsored_notice?: string | null;

@@ -23,10 +23,10 @@ export default async function AdminDashboardPage() {
     <main className="min-h-screen bg-[#f5f5f2] text-slate-950">
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-6xl px-5 py-12">
-          <p className="text-xs font-black uppercase tracking-[0.35em] text-slate-500">EDU JOURNAL CMS</p>
+          <p className="text-xs font-black uppercase tracking-[0.35em] text-slate-500">KOREA AI EDUCATION NEWS CMS</p>
           <div className="mt-4 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div>
-              <h1 className="text-4xl font-black tracking-tight md:text-6xl">에듀저널 관리자</h1>
+              <h1 className="text-4xl font-black tracking-tight md:text-6xl">한국AI교육신문 관리자</h1>
               <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600">
                 이 관리자 화면은 Supabase DB를 직접 제어합니다. 여기서 발행한 기사는 공개 홈, 카테고리, 기사 상세에 우선 반영됩니다.
               </p>

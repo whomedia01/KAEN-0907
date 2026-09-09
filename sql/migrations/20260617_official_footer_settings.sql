@@ -1,6 +1,5 @@
--- Official footer/site-settings values for Algo Partners.
+-- Official footer/site-settings values for (주)후미디어.
 -- Run this manually in Supabase SQL Editor for the target environment.
--- Do not publish date of birth or certificate QR/raw document data.
 
 insert into site_settings (
   site_name,
@@ -20,35 +19,35 @@ insert into site_settings (
   contact_phone
 )
 values (
-  '생활경제저널',
-  '생활경제, 지역상권, 교육, 시니어, 건강, 창업 현장의 브랜드와 사람을 기록하는 생활경제 전문 미디어입니다.',
-  'Algo Partners',
-  '알고파트너스',
-  '박예준',
-  '450-07-03104',
-  '제2025-인천서구-3321호',
-  'unregistered',
-  '박예준',
-  '박예준',
-  '박예준',
-  '박예준',
-  '인천광역시 서구 청라커낼로 270, 커낼힐스빌 2층 2498호 (청라동)',
-  'contact@example.com',
-  '000-0000-0000'
+  '에듀저널',
+  '평생교육, 자격증, 시니어 학습, 에듀테크, 교육기관 정보를 다루는 교육 전문 인터넷매체입니다.',
+  '(주)후미디어',
+  '(주)후미디어',
+  '황광성',
+  '119-86-25861',
+  '제2025-서울금천-0000호',
+  'preparing',
+  '황광성',
+  '황광성',
+  '황광성',
+  '황광성',
+  '서울특별시 금천구 가산디지털2로 53 (가산동) 한라시그마밸리 1102호 ~ 1104호',
+  'whomedia03@gmail.com',
+  '02-6443-4222'
 )
 on conflict do nothing;
 
 update site_settings
 set
-  operator_name = 'Algo Partners',
-  business_name = '알고파트너스',
-  representative_name = '박예준',
-  business_registration_number = '450-07-03104',
-  mail_order_registration_number = '제2025-인천서구-3321호',
-  publisher_name = coalesce(nullif(publisher_name, ''), '박예준'),
-  editor_name = coalesce(nullif(editor_name, ''), '박예준'),
-  youth_protection_manager = coalesce(nullif(youth_protection_manager, ''), '박예준'),
-  privacy_manager = coalesce(nullif(privacy_manager, ''), '박예준'),
-  address = '인천광역시 서구 청라커낼로 270, 커낼힐스빌 2층 2498호 (청라동)',
-  updated_at = now()
-where site_name = '생활경제저널';
+  operator_name = '(주)후미디어',
+  business_name = '(주)후미디어',
+  representative_name = '황광성',
+  business_registration_number = '119-86-25861',
+  publisher_name = coalesce(nullif(publisher_name, ''), '황광성'),
+  editor_name = coalesce(nullif(editor_name, ''), '황광성'),
+  youth_protection_manager = coalesce(nullif(youth_protection_manager, ''), '황광성'),
+  privacy_manager = coalesce(nullif(privacy_manager, ''), '황광성'),
+  address = '서울특별시 금천구 가산디지털2로 53 (가산동) 한라시그마밸리 1102호 ~ 1104호',
+  contact_email = 'whomedia03@gmail.com',
+  contact_phone = '02-6443-4222',
+  updated_at = now();

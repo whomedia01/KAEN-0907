@@ -79,9 +79,9 @@ function buildSvg(id: string) {
     <rect x="72" y="214" width="366" height="22" rx="11" fill="#ffffff" opacity="0.18"/>
     <rect x="72" y="258" width="258" height="18" rx="9" fill="#ffffff" opacity="0.13"/>
   </g>
-  <text x="145" y="112" font-family="Arial, sans-serif" font-size="24" font-weight="800" letter-spacing="8" fill="#fff" opacity="0.75">EDU JOURNAL</text>
+  <text x="145" y="112" font-family="Arial, sans-serif" font-size="20" font-weight="800" letter-spacing="4" fill="#fff" opacity="0.75">KOREA AI EDUCATION NEWS</text>
   <text x="145" y="675" font-family="Arial, sans-serif" font-size="44" font-weight="900" fill="#fff">${label}</text>
-  <text x="145" y="728" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#fff" opacity="0.76">교육 현장과 정책 흐름을 전하는 에듀저널 자료 이미지</text>
+  <text x="145" y="728" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#fff" opacity="0.76">한국AI교육신문 취재 자료 이미지</text>
   <text x="1260" y="705" text-anchor="middle" font-family="Arial, sans-serif" font-size="86" font-weight="900" fill="#fff" opacity="0.92">${escapeXml(theme.mark)}</text>
   <text x="1455" y="112" text-anchor="end" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#fff" opacity="0.48">${safeId}</text>
 </svg>`;

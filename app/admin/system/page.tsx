@@ -20,7 +20,7 @@ export default function AdminSystemPage() {
     <AdminModulePage
       eyebrow="MediaOffice Control Map"
       title="어드민이 공개 사이트를 제어하는 범위"
-      description="에듀저널은 코드에 기사를 직접 박아 넣는 방식에서 벗어나, 관리자 데이터베이스를 공개 사이트의 우선 데이터로 사용하는 구조로 전환합니다. 아래 항목은 관리자에서 조작하면 프론트 화면에 반영되는 핵심 범위입니다."
+      description="한국AI교육신문은 코드에 기사를 직접 박아 넣는 방식에서 벗어나, 관리자 데이터베이스를 공개 사이트의 우선 데이터로 사용하는 구조로 전환합니다. 아래 항목은 관리자에서 조작하면 프론트 화면에 반영되는 핵심 범위입니다."
       items={items}
       primaryHref="/admin/articles/new"
       primaryLabel="기사 작성하기"

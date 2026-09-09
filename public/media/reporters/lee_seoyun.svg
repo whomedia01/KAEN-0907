@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="bg-lsy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#047857"/>
+      <stop offset="100%" stop-color="#064e3b"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="100" fill="url(#bg-lsy)"/>
+  <circle cx="100" cy="75" r="38" fill="#fef3c7"/>
+  <!-- Hair style -->
+  <path d="M68 62 C68 40 82 35 100 35 C118 35 132 40 132 62 C132 80 126 95 126 100 C120 100 115 80 115 80 C110 80 90 80 85 80 C85 80 80 100 74 100 C74 95 68 80 68 62 Z" fill="#3f2f22"/>
+  <path d="M42 180 C42 135 70 125 100 125 C130 125 158 135 158 180 Z" fill="#ecfdf5"/>
+  <circle cx="88" cy="74" r="3" fill="#1f2937"/>
+  <circle cx="112" cy="74" r="3" fill="#1f2937"/>
+  <path d="M94 86 Q100 90 106 86" fill="none" stroke="#be123c" stroke-width="2" stroke-linecap="round"/>
+  <!-- Press badge text -->
+  <rect x="50" y="165" width="100" height="24" rx="12" fill="#059669"/>
+  <text x="100" y="181" fill="#ffffff" font-size="11" font-weight="bold" font-family="sans-serif" text-anchor="middle">이서윤 기자</text>
+</svg>

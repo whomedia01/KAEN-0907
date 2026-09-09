@@ -15,18 +15,49 @@ html {
 
 @media (max-width: 640px) {
   html {
-    font-size: 18px;
+    font-size: 16px;
   }
 }
 
 body {
   background: #ffffff;
-  color: #111827;
-  font-family: var(--font-noto-sans-kr), system-ui, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  line-height: 1.7;
-  letter-spacing: -0.015em;
+  color: #1e293b;
+  font-family: var(--font-noto-sans-kr), Pretendard, system-ui, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  line-height: 1.75;
+  letter-spacing: -0.02em;
   word-break: keep-all;
   overflow-wrap: anywhere;
+}
+
+/* 타 매체 벤치마킹: 신문 본문 서체 클래스 */
+.font-news-sans {
+  font-family: var(--font-noto-sans-kr), Pretendard, system-ui, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
+
+.font-news-serif {
+  font-family: var(--font-noto-serif-kr), "Nanum Myeongjo", "Batang", "Song Myung", serif;
+}
+
+/* 신문 헤드라인 벤치마킹 (조선·중앙·블로터 스타일) */
+.news-headline {
+  font-family: var(--font-noto-sans-kr), Pretendard, system-ui, -apple-system, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.32;
+  word-break: keep-all;
+}
+
+.news-subhead {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.6;
+}
+
+/* 기사 본문 가독성 최적화 */
+.article-body-text {
+  letter-spacing: -0.018em;
+  line-height: 1.92;
+  word-break: keep-all;
 }
 
 a,
@@ -42,37 +73,41 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
-.prose h1, .prose h2, .prose h3 {
-  color: #0f1f3d;
+/* 광고 친화적 레이아웃 IAB 표준 컨테이너 */
+.ad-slot-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
 }
 
-.markdown-body p {
-  margin-bottom: 1.15rem;
-  font-size: 1.08rem;
-  line-height: 1.95;
+.ad-badge {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  text-transform: uppercase;
 }
 
-.markdown-body h2 {
-  margin-top: 2.25rem;
-  margin-bottom: 1rem;
-  font-weight: 800;
-  font-size: 1.75rem;
-  line-height: 1.35;
-  letter-spacing: -0.04em;
-}
-
-.markdown-body ul {
-  list-style: disc;
-  padding-left: 1.5rem;
-}
-
-@media (max-width: 640px) {
-  .markdown-body p {
-    font-size: 1.05rem;
-    line-height: 1.9;
+/* 인쇄 모드 최적화 (언론사 표준) */
+@media print {
+  header,
+  footer,
+  .no-print,
+  .ad-slot-container {
+    display: none !important;
   }
-
-  .markdown-body h2 {
-    font-size: 1.45rem;
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .article-content {
+    font-size: 12pt !important;
+    line-height: 1.6 !important;
   }
 }

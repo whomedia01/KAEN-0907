@@ -22,7 +22,7 @@ export default function CorrectionPage() {
       <p className="text-sm font-black tracking-[0.22em] text-brand-gold">CORRECTION REQUEST</p>
       <h1 className="mt-2 text-4xl font-black text-brand-navy">정정보도·반론보도 신청</h1>
       <p className="mt-5 text-lg leading-9 text-gray-700">
-        에듀저널은 기사 내용의 사실관계 오류, 설명 보완 요청, 반론권 보장 요청을 접수합니다. 신청 내용은 편집 기준과 관련 법령 취지에 따라 확인 후 처리합니다.
+        한국AI교육신문은 기사 내용의 사실관계 오류, 설명 보완 요청, 반론권 보장 요청을 접수합니다. 신청 내용은 편집 기준과 관련 법령 취지에 따라 확인 후 처리합니다.
       </p>
 
       <section className="mt-10 border-t-2 border-brand-navy pt-7">
@@ -46,7 +46,7 @@ export default function CorrectionPage() {
 
       <section className="mt-10 border bg-gray-50 p-6 text-sm leading-7 text-gray-700">
         <h2 className="text-xl font-black text-brand-navy">접수 창구</h2>
-        <p className="mt-3">정정·반론 신청은 contact@edujournal.kr 로 접수합니다. 메일 제목에 [정정요청] 또는 [반론요청]을 표시하면 확인이 빠릅니다.</p>
+        <p className="mt-3">정정·반론 신청은 <span className="font-bold text-brand-navy">whomedia03@gmail.com</span> 으로 접수합니다. 메일 제목에 [정정요청] 또는 [반론요청]을 표시하면 확인이 빠릅니다.</p>
       </section>
     </main>
   );

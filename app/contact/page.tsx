@@ -12,7 +12,7 @@ export default function ContactPage() {
     <main className="mx-auto max-w-4xl px-4 py-12">
       <p className="text-sm font-black tracking-[0.22em] text-brand-gold">CONTACT</p>
       <h1 className="mt-2 text-4xl font-black text-brand-navy">문의</h1>
-      <p className="mt-5 text-lg leading-9 text-gray-700">에듀저널은 독자 의견, 기사 오류, 교육기관 소식, 사이트 이용 관련 문의를 접수합니다.</p>
+      <p className="mt-5 text-lg leading-9 text-gray-700">한국AI교육신문은 독자 의견, 기사 오류, AI 교육기관 소식, 사이트 이용 관련 문의를 접수합니다.</p>
       <section className="mt-10 grid gap-4 sm:grid-cols-2">
         {contacts.map(([title, body]) => (
           <div key={title} className="border bg-white p-5">

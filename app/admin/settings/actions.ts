@@ -12,7 +12,7 @@ export async function saveSiteSettings(formData: FormData): Promise<void> {
 
   const payload = {
     id: String(formData.get('id') ?? 'main'),
-    site_name: String(formData.get('site_name') ?? '에듀저널').trim(),
+    site_name: String(formData.get('site_name') ?? '한국AI교육신문').trim(),
     site_description: String(formData.get('site_description') ?? '').trim(),
     operator_name: String(formData.get('operator_name') ?? '').trim() || null,
     business_name: String(formData.get('business_name') ?? '').trim() || null,
@@ -28,6 +28,7 @@ export async function saveSiteSettings(formData: FormData): Promise<void> {
     address: String(formData.get('address') ?? '').trim() || null,
     contact_email: String(formData.get('contact_email') ?? '').trim(),
     contact_phone: String(formData.get('contact_phone') ?? '').trim(),
+    contact_fax: String(formData.get('contact_fax') ?? '').trim() || null,
     updated_at: now
   };
 
@@ -47,7 +48,5 @@ export async function saveSiteSettings(formData: FormData): Promise<void> {
   });
 
   revalidatePath('/');
-  revalidatePath('/company');
-  revalidatePath('/about');
   redirect('/admin/settings');
 }

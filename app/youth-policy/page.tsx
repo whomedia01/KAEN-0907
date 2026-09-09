@@ -14,7 +14,7 @@ export default function YouthPolicyPage() {
     <main className="mx-auto max-w-4xl px-4 py-12">
       <p className="text-sm font-black tracking-[0.22em] text-brand-gold">YOUTH PROTECTION</p>
       <h1 className="mt-2 text-4xl font-black text-brand-navy">청소년보호정책</h1>
-      <p className="mt-5 text-lg leading-9 text-gray-700">에듀저널은 교육 정보를 다루는 매체로서 청소년이 안전하게 콘텐츠를 이용할 수 있도록 다음 기준에 따라 사이트를 운영합니다.</p>
+      <p className="mt-5 text-lg leading-9 text-gray-700">한국AI교육신문은 교육 정보를 다루는 매체로서 청소년이 안전하게 콘텐츠를 이용할 수 있도록 다음 기준에 따라 사이트를 운영합니다.</p>
 
       <section className="mt-10 grid gap-4 md:grid-cols-2">
         {policies.map(([title, body]) => (
@@ -26,11 +26,13 @@ export default function YouthPolicyPage() {
       </section>
 
       <section className="mt-10 border-t-2 border-brand-navy pt-7 leading-8 text-gray-700">
-        <h2 className="text-xl font-black text-brand-navy">청소년보호책임자</h2>
+        <h2 className="text-xl font-black text-brand-navy">청소년보호책임자 및 고충처리인</h2>
         <dl className="mt-4 grid gap-3 text-sm md:grid-cols-[160px_1fr]">
-          <dt className="font-black text-gray-900">성명</dt><dd>박예준</dd>
-          <dt className="font-black text-gray-900">담당 업무</dt><dd>청소년 보호 정책 수립, 유해 콘텐츠 신고 확인, 콘텐츠 수정·차단 요청 처리</dd>
-          <dt className="font-black text-gray-900">접수 창구</dt><dd>contact@edujournal.kr</dd>
+          <dt className="font-black text-gray-900">성명 / 직위</dt><dd>황광성 (대표이사)</dd>
+          <dt className="font-black text-gray-900">담당 업무</dt><dd>청소년 보호 정책 수립·총괄, 유해 콘텐츠 모니터링, 고충처리 및 이용자 권익 보호</dd>
+          <dt className="font-black text-gray-900">공식 이메일</dt><dd>whomedia03@gmail.com</dd>
+          <dt className="font-black text-gray-900">대표전화</dt><dd>02-6443-4222</dd>
+          <dt className="font-black text-gray-900">팩스번호</dt><dd>02-6443-4223</dd>
         </dl>
       </section>
     </main>

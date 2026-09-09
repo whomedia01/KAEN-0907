@@ -11,6 +11,7 @@
     "ingest:news": "tsx scripts/ingest-real-news.ts"
   },
   "dependencies": {
+    "@google/genai": "^2.21.0",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
     "autoprefixer": "^10.4.20",
