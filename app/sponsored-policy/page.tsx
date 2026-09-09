@@ -1,0 +1,3 @@
+export const metadata = { title: '제휴 콘텐츠 윤리정책' };
+export default function SponsoredPolicyPage() { return <Policy title="제휴 콘텐츠 윤리정책"><p>생활경제저널은 일반 기사와 제휴 콘텐츠를 구분합니다. 광고주가 비용을 지급한 콘텐츠는 독자가 식별할 수 있도록 제목 아래 또는 본문 상단에 고지합니다.</p><h2>표시 기준</h2><p>브랜드 인터뷰, 광고, 협찬, 제휴 콘텐츠는 [브랜드 인터뷰 · 제휴 콘텐츠], [광고/제휴] 등의 문구를 사용합니다.</p><h2>편집 원칙</h2><p>허위·과장 표현을 제한하며, 광고주 제공 자료의 검증 한계를 독자가 오인하지 않도록 표시합니다.</p></Policy>; }
+function Policy({ title, children }: { title: string; children: React.ReactNode }) { return <main className="mx-auto max-w-3xl px-4 py-12"><h1 className="text-4xl font-black text-brand-navy">{title}</h1><div className="markdown-body mt-8 text-gray-700">{children}</div></main>; }

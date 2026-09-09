@@ -78,11 +78,6 @@ export default function FrontPage({
   // Photo Section Articles (5 items)
   const photoArticles = publishedArticles.filter((a) => a.imageUrl || a.isPhoto).slice(0, 5);
 
-  // Opinion Section Articles
-  const opinionArticles = publishedArticles.filter(
-    (a) => a.isOpinion || a.categoryId === "cat_opinion"
-  ).slice(0, 6);
-
   // Ranking News Articles (Top 10 by viewCount)
   const rankingArticles = [...publishedArticles]
     .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
@@ -93,13 +88,12 @@ export default function FrontPage({
     (a) => a.categoryId === "cat_school" || a.categoryId === "cat_policy"
   ).slice(0, 5);
 
-  // Tabbed Section Categories & Data
+  // Tabbed Section Categories & Data (4대 핵심 보도 분야)
   const tabList = [
-    { name: "라포트", catId: "cat_policy" },
-    { name: "에듀테크NOW", catId: "cat_edtech" },
-    { name: "마인드스쿨", catId: "cat_school" },
-    { name: "교사IT 및 기술", catId: "cat_literacy" },
-    { name: "디지털 교재력플랫폼", catId: "cat_opinion" }
+    { name: "정책·행정", catId: "cat_policy" },
+    { name: "학교·교육", catId: "cat_school" },
+    { name: "산업·에듀테크", catId: "cat_edtech" },
+    { name: "리터러시·인재", catId: "cat_literacy" }
   ];
 
   const currentTabCatId = tabList[activeTab]?.catId;
@@ -196,7 +190,7 @@ export default function FrontPage({
 
             {/* Info Banner 4: 기사제보 및 제휴 문의 */}
             <div className="bg-blue-50 border border-blue-200 p-2.5 rounded-2xs text-center space-y-1.5">
-              <h4 className="text-xs font-bold text-blue-900">한국AI교육일보</h4>
+              <h4 className="text-xs font-bold text-blue-900">한국AI교육신문</h4>
               <p className="text-[10px] text-blue-700">기사제보 &amp; 독자 의견</p>
               <button
                 onClick={() => onNavigatePage?.("tip_article")}
@@ -495,57 +489,13 @@ export default function FrontPage({
 
           </div>
 
-          {/* ---------------- 3. RIGHT COLUMN: Opinion, Ranking News & Exam Section ---------------- */}
+          {/* ---------------- 3. RIGHT COLUMN: Ranking News & Field Briefing ---------------- */}
           <div className="lg:col-span-3 space-y-4 text-left">
             
-            {/* Widget 1: 오피니언 (Opinion) */}
+            {/* Widget 1: 랭킹뉴스 (Ranking News) */}
             <div className="bg-white p-3.5 border border-gray-300 rounded-2xs shadow-2xs space-y-3">
               <div className="flex items-center justify-between border-b-2 border-slate-900 pb-1.5">
-                <h3 className="text-sm font-bold text-slate-900">오피니언</h3>
-                <button
-                  onClick={() => onSelectCategory("cat_opinion")}
-                  className="text-[11px] text-gray-500 hover:underline font-medium"
-                >
-                  (+더보기)
-                </button>
-              </div>
-
-              <div className="divide-y divide-gray-100 space-y-2">
-                {opinionArticles.map((art) => {
-                  const author = authors?.find((a) => a.id === art.authorId);
-                  return (
-                    <div
-                      key={art.id}
-                      onClick={() => onSelectArticle(art.id)}
-                      className="pt-2 first:pt-0 cursor-pointer group flex items-start gap-2.5"
-                    >
-                      <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden shrink-0 border border-gray-300 mt-0.5">
-                        <img
-                          src={author?.avatarUrl || "/media/hwang_kwang_sung.svg"}
-                          alt={author?.name || "기고자"}
-                          className="w-full h-full object-cover"
-                          referrerPolicy="no-referrer"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <span className="text-[10px] font-bold text-blue-900 block truncate">
-                          {author?.name || "한국AI교육일보 칼럼니스트"} ({author?.role || "전문가"})
-                        </span>
-                        <h4 className={getFontSizeClass("text-xs font-bold text-gray-800 group-hover:text-blue-700 line-clamp-2 leading-snug mt-0.5", fontSize)}>
-                          {art.title}
-                        </h4>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Widget 2: 랭킹뉴스 (Ranking News) */}
-            <div className="bg-white p-3.5 border border-gray-300 rounded-2xs shadow-2xs space-y-3">
-              <div className="flex items-center justify-between border-b-2 border-slate-900 pb-1.5">
-                <h3 className="text-sm font-bold text-slate-900">랭킹뉴스</h3>
-                <span className="text-[10px] text-gray-400">실시간 조회수 기준</span>
+                <h3 className="text-sm font-bold text-slate-900">가장 많이 본 뉴스</h3>
               </div>
 
               <div className="space-y-2">

@@ -1,70 +1,88 @@
+/* 대한민국 인터넷 언론 매체 대표 대중적 폰트 스택 */
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
-@import url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonnu-2021.05/GmarketSans.css');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&family=Noto+Serif+KR:wght@400;600;700;900&display=swap');
 @import url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonnu-2021.05/KoPubWorldBatang.css');
-@import url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonnu-2021.05/BareunBatang.css');
-@import url('https://cdn.jsdelivr.net/gh/webfontworld/bareun/BareunBatang.css');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
-  --font-serif: "Bareun Batang", "BareunBatang", "KoPubWorld Batang", "KoPubBatang", "KoPub Batang", "Noto Serif KR", Georgia, serif;
-  --font-gmarket: "GmarketSansBold", "GmarketSansMedium", "Gmarket Sans", sans-serif;
-  --font-pretendard: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-kopub: "KoPubWorld Batang", "KoPubBatang", "KoPub Batang", "Noto Serif KR", Georgia, serif;
-  --font-bareun-batang: "Bareun Batang", "BareunBatang", "KoPubWorld Batang", "KoPubBatang", "Nanum Myeongjo", Batang, serif;
+  --font-sans: "Pretendard Variable", "Pretendard", "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", "Nanum Gothic", "Malgun Gothic", sans-serif;
+  --font-serif: "Noto Serif KR", "Nanum Myeongjo", "KoPubWorld Batang", "Batang", Georgia, serif;
+  --font-pretendard: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-noto: "Noto Sans KR", "Pretendard Variable", "Pretendard", sans-serif;
+  --font-nanum: "Nanum Gothic", "Noto Sans KR", sans-serif;
+  --font-kopub: "Noto Serif KR", "KoPubWorld Batang", "Nanum Myeongjo", Batang, serif;
+  --font-bareun-batang: "Noto Serif KR", "KoPubWorld Batang", "Nanum Myeongjo", Batang, serif;
 }
 
-/* Base custom styles using Pretendard font family across UI elements */
+/* Base custom styles using popular Korean internet news media font family across UI elements */
 html, body, button, input, select, textarea {
-  font-family: var(--font-pretendard);
+  font-family: var(--font-sans);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.015em;
 }
 
 /* Font utility classes for exact typography specifications */
-.font-gmarket {
-  font-family: "GmarketSansBold", "GmarketSansMedium", "Gmarket Sans", sans-serif !important;
+.font-sans, .font-news-sans {
+  font-family: "Pretendard Variable", "Pretendard", "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", "Nanum Gothic", "Malgun Gothic", sans-serif !important;
 }
 
 .font-pretendard {
-  font-family: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important;
+  font-family: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif !important;
 }
 
-.font-kopub {
-  font-family: "KoPubWorld Batang", "KoPubBatang", "KoPub Batang", "Noto Serif KR", Georgia, serif !important;
+.font-noto {
+  font-family: "Noto Sans KR", "Pretendard Variable", "Pretendard", sans-serif !important;
 }
 
-.font-bareun-batang, .font-batang {
-  font-family: "Bareun Batang", "BareunBatang", "KoPubWorld Batang", "KoPubBatang", "Nanum Myeongjo", "Noto Serif KR", Batang, serif !important;
+.font-nanum {
+  font-family: "Nanum Gothic", "Noto Sans KR", sans-serif !important;
 }
 
-/* Print-quality Article formatting styles (CMS rich text output styling) */
+.font-serif, .font-news-serif, .font-serif-kr, .font-kopub, .font-bareun-batang, .font-batang {
+  font-family: "Noto Serif KR", "Nanum Myeongjo", "KoPubWorld Batang", Batang, Georgia, serif !important;
+}
+
+/* 인터넷 언론 매체 표준 기사 조판 스타일 (네이버 뉴스, 연합뉴스, 조선일보 웹 규격) */
+.markdown-body {
+  font-family: var(--font-sans);
+}
+
 .markdown-body h2 {
-  font-family: var(--font-pretendard);
+  font-family: var(--font-sans);
   font-weight: 700;
   font-size: 1.25rem;
   color: #111827;
   margin-top: 1.75rem;
   margin-bottom: 0.75rem;
-  line-height: 1.4;
-  letter-spacing: -0.01em;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
   border-left: none;
   padding-left: 0;
 }
 
 .markdown-body p {
-  font-family: var(--font-kopub);
+  font-family: var(--font-sans);
   font-size: 17px;
   margin-bottom: 1.5rem;
-  line-height: 1.7;
-  color: #1a1a1a;
-  text-align: justify;
-  word-break: break-all;
+  line-height: 1.8;
+  color: #1f2937;
+  text-align: left;
+  letter-spacing: -0.015em;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* 명조체 모드 선택 시 기사 본문 서체 */
+.markdown-body.font-serif p,
+.font-serif .markdown-body p {
+  font-family: var(--font-serif);
+  line-height: 1.85;
 }
 
 .markdown-body blockquote {
-  font-family: var(--font-kopub);
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 1.05rem;
   border-left: none;
@@ -76,6 +94,7 @@ html, body, button, input, select, textarea {
   margin: 2rem 0;
   text-align: center;
   border-radius: 0;
+  line-height: 1.75;
 }
 
 .markdown-body ul, .markdown-body ol {

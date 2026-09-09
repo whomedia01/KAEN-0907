@@ -1,0 +1,20 @@
+[
+  {
+    "name": "연합뉴스 경제 RSS",
+    "url": "https://www.yna.co.kr/rss/economy.xml",
+    "defaultCategory": "생활경제",
+    "kind": "rss"
+  },
+  {
+    "name": "연합뉴스 사회 RSS",
+    "url": "https://www.yna.co.kr/rss/society.xml",
+    "defaultCategory": "생활경제",
+    "kind": "rss"
+  },
+  {
+    "name": "대한민국 정책브리핑",
+    "url": "https://www.korea.kr/rss/policy.xml",
+    "defaultCategory": "보도자료",
+    "kind": "rss"
+  }
+]

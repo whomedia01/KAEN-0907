@@ -101,7 +101,7 @@ export default function StaticPages({
             <div className="border-b border-neutral-200 pb-4">
               <span className="text-xs font-bold text-blue-800 uppercase tracking-widest block mb-1">FOUNDING EDITORIAL</span>
               <h1 className="text-2xl font-serif font-black text-neutral-900 border-l-4 border-blue-800 pl-3">
-                한국AI교육일보 창간사 (Founding Statement)
+                한국AI교육신문 창간사 (Founding Statement)
               </h1>
             </div>
 
@@ -113,13 +113,13 @@ export default function StaticPages({
                 인공지능(AI) 기술의 대전환은 교육 현장에 근본적인 패러다임 변화를 요구하고 있습니다. 교실에서의 공교육 AI 통합, 스마트 에듀테크 생태계 구축, 디지털 리터러시 및 윤리 교육의 정착은 미래 대한민국 경쟁력을 좌우할 핵심 과제입니다.
               </p>
               <p>
-                <strong>'한국AI교육일보'</strong>은 이러한 시대적 사명에 부응하여 교사, 학생, 학부모, 정책 당국, 에듀테크 기업을 잇는 공신력 있는 미래 교육 전문 언론으로 창간되었습니다. 초·중·고교 및 고등교육, 평생교육 현장의 AI 혁신 소식을 가장 신속하고 정밀하게 전달하고자 합니다.
+                <strong>'한국AI교육신문'</strong>은 이러한 시대적 사명에 부응하여 교사, 학생, 학부모, 정책 당국, 에듀테크 기업을 잇는 공신력 있는 미래 교육 전문 언론으로 창간되었습니다. 초·중·고교 및 고등교육, 평생교육 현장의 AI 혁신 소식을 가장 신속하고 정밀하게 전달하고자 합니다.
               </p>
               <p>
                 우리는 사실 검증에 기반한 객관적 보도를 원칙으로 삼으며, 교원 역량 강화와 교육 격차 해소를 위한 깊이 있는 정책 분석과 지식 전달에 최선을 다할 것입니다. 또한 무분별한 과장 광고나 검증되지 않은 에듀테크 정보로부터 독자의 권익을 보호하는 언론 본연의 책무를 성실히 이행하겠습니다.
               </p>
               <p className="pt-2 text-right font-sans text-xs font-bold text-slate-700">
-                한국AI교육일보 발행인·편집인 <span className="text-slate-900 text-sm font-black ml-1">황 광 성</span>
+                한국AI교육신문 발행인·편집인 <span className="text-slate-900 text-sm font-black ml-1">황 광 성</span>
               </p>
             </div>
 
@@ -138,14 +138,18 @@ export default function StaticPages({
                 <Layers className="h-6 w-6 text-blue-800" />
                 <h3 className="text-sm font-bold text-neutral-900">언론사 및 사업주체 정보</h3>
                 <div className="text-xs text-neutral-600 space-y-1 leading-snug">
-                  <p><strong>발행 매체명:</strong> 한국AI교육일보 (KOREA AI EDU NEWS)</p>
-                  <p><strong>사업주체 법인:</strong> (주)후미디어 (WhoMedia Co., Ltd.)</p>
-                  <p><strong>발행인 / 편집인:</strong> 황광성</p>
-                  <p><strong>청소년보호책임자:</strong> 황광성 (발행인·편집인 겸임)</p>
-                  <p><strong>고충처리인:</strong> 황광성</p>
-                  <p><strong>주소:</strong> 서울특별시 금천구 가산디지털2로 53 한라시그마밸리 1102호~1104호</p>
-                  <p><strong>대표전화:</strong> 02-6443-4222 | <strong>팩스:</strong> 02-6443-4230</p>
-                  <p><strong>공식 이메일:</strong> {settings.email || "whomedia6104@gmail.com"}</p>
+                  <p><strong>발행 매체명:</strong> {settings.newspaperName || "한국AI교육신문"}</p>
+                  <p><strong>사업주체 법인:</strong> {settings.companyName || "(주)후미디어"}</p>
+                  <p><strong>인터넷신문 등록번호:</strong> {settings.registrationNo || ""}</p>
+                  {settings.registrationDate ? (
+                    <p><strong>등록연월일:</strong> {settings.registrationDate}</p>
+                  ) : null}
+                  <p><strong>발행인 / 편집인:</strong> {settings.representative || "황광성"}</p>
+                  <p><strong>청소년보호책임자:</strong> {settings.youthOfficer || "황광성"}</p>
+                  <p><strong>고충처리인:</strong> {settings.grievanceOfficer || "황광성"}</p>
+                  <p><strong>주소:</strong> {settings.address || ""}</p>
+                  <p><strong>대표전화:</strong> {settings.phone || ""}{settings.fax ? ` | 팩스: ${settings.fax}` : ""}</p>
+                  <p><strong>공식 이메일:</strong> {settings.email || ""}</p>
                 </div>
               </div>
             </div>
@@ -158,14 +162,14 @@ export default function StaticPages({
             <div className="border-b border-neutral-200 pb-4">
               <span className="text-xs font-bold text-blue-800 uppercase tracking-widest block mb-1">ETHICS & EDITORIAL POLICY</span>
               <h1 className="text-2xl font-serif font-black text-neutral-900 border-l-4 border-blue-800 pl-3">
-                한국AI교육일보 윤리강령 및 편집규약
+                한국AI교육신문 윤리강령 및 편집규약
               </h1>
             </div>
 
             <div className="bg-slate-50 p-5 rounded border border-slate-200 text-xs text-slate-800 leading-relaxed font-serif space-y-2">
               <p className="font-bold text-sm text-slate-900">[전 문]</p>
               <p>
-                한국AI교육일보은 대한민국 미래교육 발전과 인공지능(AI) 시대의 올바른 저널리즘 가치를 실현하기 위하여 사명감을 가지고 정론직필에 임합니다. 우리는 신문윤리강령 및 인터넷신문 윤리강령을 준수하고, 독립적이고 공정한 보도를 통해 독자의 알 권리를 충족시키며 공익에 봉사할 것을 다짐합니다. 이에 전 임직원이 준수해야 할 윤리강령 및 편집규약을 제정하여 철저히 이행합니다.
+                한국AI교육신문은 대한민국 미래교육 발전과 인공지능(AI) 시대의 올바른 저널리즘 가치를 실현하기 위하여 사명감을 가지고 정론직필에 임합니다. 우리는 신문윤리강령 및 인터넷신문 윤리강령을 준수하고, 독립적이고 공정한 보도를 통해 독자의 알 권리를 충족시키며 공익에 봉사할 것을 다짐합니다. 이에 전 임직원이 준수해야 할 윤리강령 및 편집규약을 제정하여 철저히 이행합니다.
               </p>
             </div>
 
@@ -245,7 +249,7 @@ export default function StaticPages({
               <div className="border-l-2 border-blue-800 pl-4 py-1 space-y-1">
                 <h3 className="font-bold text-sm text-slate-900">제10조 (준수 의무 및 시행)</h3>
                 <p>
-                  본 윤리강령 및 편집규약은 2026년 1월 1일부터 시행되며, 한국AI교육일보의 모든 기자, 에디터 및 임직원은 본 규약을 반드시 준수하여야 합니다.
+                  본 윤리강령 및 편집규약은 2026년 1월 1일부터 시행되며, 한국AI교육신문의 모든 기자, 에디터 및 임직원은 본 규약을 반드시 준수하여야 합니다.
                 </p>
               </div>
             </div>
@@ -256,7 +260,7 @@ export default function StaticPages({
         return (
           <div className="space-y-6 text-left">
             <h1 className="text-2xl font-serif font-black text-neutral-900 border-l-4 border-blue-800 pl-3">
-              {settings.newspaperName || "한국AI교육일보"} 기자단 소개 (Editorial Staff)
+              {settings.newspaperName || "한국AI교육신문"} 기자단 소개 (Editorial Staff)
             </h1>
             <p className="text-xs text-neutral-600 mb-6">
               각 교육 현장과 에듀테크 기술 개발 최전선에서 정교한 사실 검증과 취재 노력을 아끼지 않는 전문 기자단을 공개합니다.
@@ -304,7 +308,7 @@ export default function StaticPages({
                 <CheckCircle2 className="h-10 w-10 text-emerald-600 mx-auto" />
                 <h3 className="text-sm font-bold text-neutral-900">취재 제보가 정상 접수 되었습니다!</h3>
                 <p className="text-xs text-neutral-600">
-                  접수된 정보는 {settings.newspaperName || "한국AI교육일보"} 편집국 데이터베이스에 안전하게 전달되었으며, 담당 기자 검토 후 신속히 보강 취재가 진행됩니다. 감사드립니다.
+                  접수된 정보는 {settings.newspaperName || "한국AI교육신문"} 편집국 데이터베이스에 안전하게 전달되었으며, 담당 기자 검토 후 신속히 보강 취재가 진행됩니다. 감사드립니다.
                 </p>
                 <button
                   onClick={() => setTipSubmitted(false)}
@@ -389,14 +393,14 @@ export default function StaticPages({
                 언론중재 및 피해구제 등에 관한 법률에 따른 고충처리제도 안내
               </h3>
               <p>
-                {settings.newspaperName || "한국AI교육일보"}은 「언론중재 및 피해구제 등에 관한 법률」 제6조에 의거하여 보도 내용으로 인한 독자 및 이해관계인의 피해를 예방하고 권익을 자율적으로 구제하기 위해 고충처리인 제도를 엄격히 운영하고 있습니다.
+                {settings.newspaperName || "한국AI교육신문"}은 「언론중재 및 피해구제 등에 관한 법률」 제6조에 의거하여 보도 내용으로 인한 독자 및 이해관계인의 피해를 예방하고 권익을 자율적으로 구제하기 위해 고충처리인 제도를 엄격히 운영하고 있습니다.
               </p>
               <div className="pt-2 text-slate-800 font-medium grid grid-cols-1 md:grid-cols-2 gap-2 bg-white p-3 rounded border border-slate-200/80">
                 <p>• <strong>고충처리인:</strong> 황광성 (발행인·편집인 겸임)</p>
-                <p>• <strong>접수 이메일:</strong> {settings.email || "whomedia6104@gmail.com"}</p>
+                <p>• <strong>접수 이메일:</strong> {settings.email || "whomedia03@gmail.com"}</p>
                 <p>• <strong>대표 전화:</strong> 02-6443-4222</p>
-                <p>• <strong>팩스:</strong> 02-6443-4230</p>
-                <p className="md:col-span-2">• <strong>서면 접수 주소:</strong> 서울특별시 금천구 가산디지털2로 53 한라시그마밸리 1102호~1104호 고충처리위원회</p>
+                <p>• <strong>팩스:</strong> 02-6443-4223</p>
+                <p className="md:col-span-2">• <strong>서면 접수 주소:</strong> 서울특별시 금천구 가산디지털2로 53 (가산동) 한라시그마밸리 1102호~1104호 고충처리위원회</p>
               </div>
 
               <div className="space-y-2 pt-2 border-t border-slate-200 text-slate-600">
@@ -520,7 +524,7 @@ export default function StaticPages({
               <div>
                 <h3 className="font-bold text-neutral-900 text-sm border-l-2 border-blue-800 pl-2">제1조 (목적)</h3>
                 <p className="mt-1">
-                  본 약관은 주식회사 후미디어(이하 "회사")가 운영하는 인터넷신문 서비스 {settings.newspaperName || "한국AI교육일보"}(이하 "서비스")을 이용함에 있어 회사와 이용자(이하 "독자" 또는 "회원")간의 권리·의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
+                  본 약관은 주식회사 후미디어(이하 "회사")가 운영하는 인터넷신문 서비스 {settings.newspaperName || "한국AI교육신문"}(이하 "서비스")을 이용함에 있어 회사와 이용자(이하 "독자" 또는 "회원")간의 권리·의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
                 </p>
               </div>
 
@@ -605,7 +609,7 @@ export default function StaticPages({
             </div>
 
             <p className="bg-slate-50 p-4 rounded border border-slate-200 text-slate-700">
-              주식회사 후미디어(이하 "회사")가 운영하는 인터넷신문 {settings.newspaperName || "한국AI교육일보"}은 「개인정보 보호법」 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리방침을 수립·공개합니다.
+              주식회사 후미디어(이하 "회사")가 운영하는 인터넷신문 {settings.newspaperName || "한국AI교육신문"}은 「개인정보 보호법」 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리방침을 수립·공개합니다.
             </p>
 
             <div className="space-y-4">
@@ -685,8 +689,8 @@ export default function StaticPages({
                 <h3 className="font-bold text-neutral-900 text-sm border-l-2 border-blue-800 pl-2">10. 개인정보 보호책임자</h3>
                 <p className="mt-1">
                   - <strong>개인정보 보호책임자:</strong> 황광성 (발행인·편집인)<br />
-                  - <strong>연락처:</strong> 02-6443-4222 / {settings.email || "whomedia6104@gmail.com"}<br />
-                  - <strong>주소:</strong> 서울특별시 금천구 가산디지털2로 53 한라시그마밸리 1102호~1104호
+                  - <strong>연락처:</strong> 02-6443-4222 / {settings.email || "whomedia03@gmail.com"}<br />
+                  - <strong>주소:</strong> 서울특별시 금천구 가산디지털2로 53 (가산동) 한라시그마밸리 1102호~1104호
                 </p>
               </div>
 
@@ -718,7 +722,7 @@ export default function StaticPages({
             </div>
 
             <p className="bg-slate-50 p-4 rounded border border-slate-200 text-slate-700">
-              {settings.newspaperName || "한국AI교육일보"}은 유해한 환경으로부터 청소년을 보호하고, 올바른 인성 및 디지털 리터러시를 함양할 수 있도록 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」 및 「청소년 보호법」에 근거하여 청소년 보호정책을 시행하고 있습니다.
+              {settings.newspaperName || "한국AI교육신문"}은 유해한 환경으로부터 청소년을 보호하고, 올바른 인성 및 디지털 리터러시를 함양할 수 있도록 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」 및 「청소년 보호법」에 근거하여 청소년 보호정책을 시행하고 있습니다.
             </p>
 
             <div className="space-y-4">
@@ -754,9 +758,9 @@ export default function StaticPages({
                 <h3 className="font-bold text-neutral-900 text-sm border-l-2 border-blue-800 pl-2">5. 청소년보호책임자 및 담당자 지정</h3>
                 <p className="mt-1">
                   - <strong>청소년보호책임자:</strong> 황광성 (발행인·편집인)<br />
-                  - <strong>전화번호:</strong> 02-6443-4222 | <strong>팩스:</strong> 02-6443-4230<br />
-                  - <strong>전자우편:</strong> {settings.email || "whomedia6104@gmail.com"}<br />
-                  - <strong>주소:</strong> 서울특별시 금천구 가산디지털2로 53 한라시그마밸리 1102호~1104호
+                  - <strong>전화번호:</strong> 02-6443-4222 | <strong>팩스:</strong> 02-6443-4223<br />
+                  - <strong>전자우편:</strong> {settings.email || "whomedia03@gmail.com"}<br />
+                  - <strong>주소:</strong> 서울특별시 금천구 가산디지털2로 53 (가산동) 한라시그마밸리 1102호~1104호
                 </p>
               </div>
             </div>
@@ -767,7 +771,7 @@ export default function StaticPages({
         const mockRssXml = `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>${settings.newspaperName || "한국AI교육일보"} 뉴스 피드</title>
+    <title>${settings.newspaperName || "한국AI교육신문"} 뉴스 피드</title>
     <link>http://kaen-news.kr</link>
     <description>AI 교육 혁신과 대한민국 미래 에듀테크 뉴스</description>
     <language>ko-KR</language>
@@ -798,7 +802,7 @@ export default function StaticPages({
             <div className="flex items-center gap-2">
               <Rss className="h-6 w-6 text-amber-600" />
               <div>
-                <h1 className="text-2xl font-serif font-black text-neutral-900">{settings.newspaperName || "한국AI교육일보"} RSS XML 피드</h1>
+                <h1 className="text-2xl font-serif font-black text-neutral-900">{settings.newspaperName || "한국AI교육신문"} RSS XML 피드</h1>
                 <p className="text-xs text-neutral-500">포털 뉴스 수집 표준 및 제휴 크롤링 표준 XML 규격을 제공합니다.</p>
               </div>
             </div>

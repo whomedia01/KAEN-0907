@@ -1,0 +1,3 @@
+export const metadata = { title: '환불정책' };
+export default function RefundPolicyPage() { return <Policy title="환불정책"><ul><li>결제 후 인터뷰/자료 제출 전: 100% 환불 가능</li><li>인터뷰 질문지 발송 또는 자료 검토 착수 후: 기획비/실비 공제 가능</li><li>기사 초안 작성 후: 환불 제한</li><li>고객 검수 후 발행 완료 시: 환불 불가</li><li>사업자 귀책으로 서비스 제공이 불가능한 경우 환불 가능</li></ul><p>환불 요청은 이메일 또는 신청 내역을 통해 접수합니다.</p></Policy>; }
+function Policy({ title, children }: { title: string; children: React.ReactNode }) { return <main className="mx-auto max-w-3xl px-4 py-12"><h1 className="text-4xl font-black text-brand-navy">{title}</h1><div className="markdown-body mt-8 text-gray-700">{children}</div></main>; }

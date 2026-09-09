@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { ArrowLeft, Eye, Calendar, Clock, Share2, Volume2, VolumeX, BadgeHelp, Heart, MessageSquare, Send, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, BadgeHelp, Heart } from "lucide-react";
 import { Article, Category, Author, Comment, SiteSetting } from "../types";
+import SEOHead from "./SEOHead";
 
 interface ArticleViewProps {
   article: Article;
@@ -35,15 +36,8 @@ export default function ArticleView({
   // Real-time View Count State
   const [currentViewCount, setCurrentViewCount] = useState<number>(article.viewCount || 0);
 
-  // TTS State
-  const [ttsPlaying, setTtsPlaying] = useState(false);
-  const [ttsPaused, setTtsPaused] = useState(false);
-  const [synth, setSynth] = useState<SpeechSynthesis | null>(null);
-  const [utterance, setUtterance] = useState<SpeechSynthesisUtterance | null>(null);
-
   const matchedCategory = categories.find((c) => c.id === article.categoryId);
   const matchedAuthor = authors.find((a) => a.id === article.authorId);
-  const approvedComments = comments.filter((c) => c.articleId === article.id && c.status === "approved");
 
   // Dynamically increment real view count upon opening article
   useEffect(() => {
@@ -63,85 +57,22 @@ export default function ArticleView({
     }
   }, [article.id]);
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.speechSynthesis) {
-      setSynth(window.speechSynthesis);
-    }
-    return () => {
-      if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, []);
-
-  const handleTtsPlay = () => {
-    if (!synth) return;
-
-    if (ttsPaused) {
-      synth.resume();
-      setTtsPlaying(true);
-      setTtsPaused(false);
-      return;
-    }
-
-    synth.cancel();
-
-    // Strip HTML to get raw text for speaking
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = article.content;
-    const rawContentText = tempDiv.textContent || tempDiv.innerText || "";
-    const fullTextToSpeak = `${article.title}. 취재: ${matchedAuthor ? matchedAuthor.name : "편집국 취재팀"}. 본문 요약: ${article.excerpt}. 본문: ${rawContentText}`;
-
-    const newUtterance = new SpeechSynthesisUtterance(fullTextToSpeak);
-    newUtterance.lang = "ko-KR";
-    newUtterance.rate = 1.0;
-
-    newUtterance.onend = () => {
-      setTtsPlaying(false);
-      setTtsPaused(false);
-    };
-
-    newUtterance.onerror = () => {
-      setTtsPlaying(false);
-      setTtsPaused(false);
-    };
-
-    setUtterance(newUtterance);
-    synth.speak(newUtterance);
-    setTtsPlaying(true);
-    setTtsPaused(false);
-  };
-
-  const handleTtsPause = () => {
-    if (!synth) return;
-    synth.pause();
-    setTtsPlaying(false);
-    setTtsPaused(true);
-  };
-
-  const handleTtsStop = () => {
-    if (!synth) return;
-    synth.cancel();
-    setTtsPlaying(false);
-    setTtsPaused(false);
-  };
-
   // Generate dynamic font size classes
   const getFontSizeClass = (type: "title" | "body" | "meta") => {
     if (fontSize === 1) {
-      if (type === "title") return "text-[28px] md:text-[32px] font-pretendard font-bold text-neutral-900 leading-snug";
-      if (type === "body") return "text-[16px] md:text-[17px] text-[#1a1a1a] leading-[1.7] font-kopub font-medium";
-      return "text-xs text-neutral-500 font-pretendard";
+      if (type === "title") return "text-[28px] md:text-[32px] font-sans font-bold text-neutral-900 leading-snug tracking-tight";
+      if (type === "body") return "text-[16px] md:text-[17px] text-[#1f2937] leading-[1.8] font-sans";
+      return "text-xs text-neutral-500 font-sans";
     }
     if (fontSize === 2) {
-      if (type === "title") return "text-[32px] md:text-[34px] font-pretendard font-bold text-neutral-900 leading-snug";
-      if (type === "body") return "text-[17px] md:text-[18px] text-[#1a1a1a] leading-[1.7] font-kopub font-medium";
-      return "text-sm text-neutral-500 font-pretendard";
+      if (type === "title") return "text-[32px] md:text-[34px] font-sans font-bold text-neutral-900 leading-snug tracking-tight";
+      if (type === "body") return "text-[17px] md:text-[18px] text-[#1f2937] leading-[1.8] font-sans";
+      return "text-sm text-neutral-500 font-sans";
     }
     // fontSize === 3
-    if (type === "title") return "text-[36px] md:text-[38px] font-pretendard font-bold text-neutral-900 leading-snug";
-    if (type === "body") return "text-[19px] md:text-[20px] text-[#050505] leading-[1.75] font-kopub font-medium";
-    return "text-base text-neutral-600 font-pretendard";
+    if (type === "title") return "text-[36px] md:text-[38px] font-sans font-bold text-neutral-900 leading-snug tracking-tight";
+    if (type === "body") return "text-[19px] md:text-[20px] text-[#111827] leading-[1.85] font-sans";
+    return "text-base text-neutral-500 font-sans";
   };
 
   // Prepend standard newspaper byline prefix to the first paragraph and strip layout artifacts
@@ -172,10 +103,10 @@ export default function ArticleView({
     const authorName = matchedAuthor ? matchedAuthor.name : "편집국 취재팀";
     const isTeam = authorName.includes("취재팀") || authorName.includes("편집국") || authorName.includes("발행인") || authorName.includes("편집인");
     const authorRole = isTeam ? "" : (matchedAuthor ? (matchedAuthor.role === 'Reporter' ? '기자' : matchedAuthor.role === 'Admin' ? '발행인' : matchedAuthor.role) : "");
-    const newspaper = siteSetting?.newspaperName || "한국AI교육일보";
+    const newspaper = siteSetting?.newspaperName || "한국AI교육신문";
     const byline = authorRole ? `[${newspaper} = ${authorName} ${authorRole}]` : `[${newspaper} = ${authorName}]`;
     
-    // Check if a dateline like [한국AI교육일보 = ...] or author byline is already present in content to prevent duplication
+    // Check if a dateline like [한국AI교육신문 = ...] or author byline is already present in content to prevent duplication
     const hasDateline = /\[[^\]]*=[^\]]*\]/.test(content) || content.includes(byline);
     
     if (!hasDateline) {
@@ -241,54 +172,6 @@ export default function ArticleView({
     localStorage.setItem(`likes_${article.id}`, nextCount.toString());
   };
 
-  // Article Comments Form & Moderation State
-  const [commentName, setCommentName] = useState("");
-  const [commentEmail, setCommentEmail] = useState("");
-  const [commentText, setCommentText] = useState("");
-  const [commentSubmitted, setCommentSubmitted] = useState(false);
-  const [showComments, setShowComments] = useState(true);
-
-  const handleCommentSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!commentName.trim() || !commentText.trim()) return;
-
-    onPostComment(
-      commentName.trim(),
-      commentEmail.trim() || "reader@kaen-news.co.kr",
-      commentText.trim()
-    );
-
-    setCommentName("");
-    setCommentEmail("");
-    setCommentText("");
-    setCommentSubmitted(true);
-    setTimeout(() => setCommentSubmitted(false), 7000);
-  };
-
-  // Generate JSON-LD Schema Script representing dynamic NewsArticle markup
-  const jsonLdSchema = {
-    "@context": "https://schema.org",
-    "@type": "NewsArticle",
-    "headline": article.title,
-    "image": [article.imageUrl],
-    "datePublished": article.createdAt,
-    "dateModified": article.createdAt,
-    "author": {
-      "@type": "Organization",
-      "name": matchedAuthor ? matchedAuthor.name : "편집국 취재팀",
-      "jobTitle": matchedAuthor ? matchedAuthor.role : "Editorial Team"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": siteSetting?.newspaperName || "한국인터넷신문",
-      "logo": {
-        "@type": "ImageObject",
-        "url": siteSetting?.logoUrl || "https://picsum.photos/seed/newspaper_logo/200/60"
-      }
-    },
-    "description": article.excerpt
-  };
-
   return (
     <motion.article
       initial={{ opacity: 0, y: 15 }}
@@ -298,10 +181,14 @@ export default function ArticleView({
       className={`max-w-[800px] mx-auto px-4 md:px-6 py-8 ${readingMode ? "bg-amber-50/10" : "bg-white"}`}
       id="main-content"
     >
-      {/* Dynamic JSON-LD injection in raw format for SEO audits */}
-      <script type="application/ld+json">
-        {JSON.stringify(jsonLdSchema)}
-      </script>
+      {/* Dynamic React Helmet SEO & OpenGraph Head Tag Management */}
+      <SEOHead
+        article={article}
+        category={matchedCategory}
+        author={matchedAuthor}
+        siteSetting={siteSetting}
+        canonicalUrl={typeof window !== "undefined" ? window.location.href : undefined}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Main Article Body Column */}
@@ -332,7 +219,7 @@ export default function ArticleView({
           {/* Meta Header Byline Block */}
           <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-600 mb-4 font-pretendard bg-slate-50 p-2.5 rounded border border-gray-200">
             <span className="font-bold text-neutral-900">
-              취재: {matchedAuthor ? matchedAuthor.name : "편집국 취재팀"} ({matchedAuthor?.email || siteSetting?.email || "whomedia6104@gmail.com"})
+              취재: {matchedAuthor ? matchedAuthor.name : "편집국 취재팀"} ({matchedAuthor?.email || siteSetting?.email || "whomedia03@gmail.com"})
             </span>
             <span className="text-neutral-300 mx-1">|</span>
             <span>
@@ -353,45 +240,6 @@ export default function ArticleView({
               ))}
             </div>
           )}
-
-          {/* TTS Visualizer & Controller (Inline integration matching news site utility) */}
-          <div className="flex items-center justify-between gap-4 border-y border-neutral-100 py-2 mb-6 bg-neutral-50/50 px-3 rounded font-sans text-xs">
-            <div className="flex items-center space-x-2">
-              <div className="bg-white border border-neutral-200 rounded-full px-2.5 py-0.5 flex items-center space-x-1.5 shadow-sm">
-                <button
-                  onClick={ttsPlaying ? handleTtsPause : handleTtsPlay}
-                  className={`p-1 rounded-full transition ${
-                    ttsPlaying ? "bg-sky-600 text-white animate-pulse" : "hover:bg-neutral-100 text-neutral-600"
-                  }`}
-                  title={ttsPlaying ? "낭독 일시정지" : "기사 듣기 (성우 음성 지원)"}
-                  id="btn-tts-toggle"
-                >
-                  {ttsPlaying ? <Volume2 className="h-3 w-3" /> : <VolumeX className="h-3 w-3" />}
-                </button>
-                {ttsPlaying && (
-                  <span className="text-[9px] text-sky-800 font-bold animate-bounce">PLAYING</span>
-                )}
-                {(ttsPlaying || ttsPaused) && (
-                  <button
-                    onClick={handleTtsStop}
-                    className="text-[9px] text-rose-500 font-bold hover:underline px-1 py-0.5"
-                    title="재생 중단"
-                    id="btn-tts-stop"
-                  >
-                    중지
-                  </button>
-                )}
-                {!ttsPlaying && !ttsPaused && (
-                  <span className="text-[9px] text-neutral-400 font-bold">기사 낭독 (TTS)</span>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1.5 text-neutral-400 font-mono text-[11px]">
-              <Eye className="h-3.5 w-3.5 text-neutral-300" />
-              <span>조회수 {currentViewCount.toLocaleString()}회</span>
-            </div>
-          </div>
 
           {/* Featured Header Media graphic */}
           {article.imageUrl && (
@@ -417,7 +265,7 @@ export default function ArticleView({
 
           {/* Raw HTML Rich content displaying */}
           <div
-            className={`markdown-body prose max-w-none ${getFontSizeClass("body")} mb-6 text-neutral-800`}
+            className={`markdown-body prose max-w-none font-sans font-pretendard ${getFontSizeClass("body")} mb-6 text-neutral-800`}
             dangerouslySetInnerHTML={{ __html: getProcessedContent() }}
             id="article-body-content"
           />
@@ -425,13 +273,13 @@ export default function ArticleView({
           {/* Copyright & Statutory Press Notice block directly below article content */}
           <div className="bg-slate-50 border border-slate-200/80 rounded p-3.5 my-6 space-y-1.5 text-xs text-slate-600 select-none font-sans text-left">
             <div className="flex flex-wrap items-center justify-between gap-2 font-bold text-slate-800 text-[11px] md:text-xs">
-              <span>[저작권자ⓒ {siteSetting?.newspaperName || "한국AI교육일보"}. 무단전재-재배포 금지]</span>
+              <span>[저작권자ⓒ {siteSetting?.newspaperName || "한국AI교육신문"}. 무단전재-재배포 금지]</span>
               <span className="text-blue-800 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 text-[10px] font-mono">
                 저작권법 제28조 정당한 인용 원칙 준수
               </span>
             </div>
             <p className="text-[11px] leading-relaxed text-slate-500">
-              본 기사의 무단 복제, 전재, 재배포 및 AI(인공지능) 생성형 모델의 무단 학습·크롤링 데이터 수집을 엄격히 금합니다. 저작권법 제28조(공표된 저작물의 인용)에 의거 보도·비평·교육 등을 위하여 인용할 시에는 출처('한국AI교육일보') 및 기자명을 명확히 기재하여야 합니다.
+              본 기사의 무단 복제, 전재, 재배포 및 AI(인공지능) 생성형 모델의 무단 학습·크롤링 데이터 수집을 엄격히 금합니다. 저작권법 제28조(공표된 저작물의 인용)에 의거 보도·비평·교육 등을 위하여 인용할 시에는 출처('{siteSetting?.newspaperName || "한국AI교육신문"}') 및 기자명을 명확히 기재하여야 합니다.
             </p>
           </div>
 
@@ -455,7 +303,7 @@ export default function ArticleView({
               {matchedAuthor ? matchedAuthor.name : "편집국 취재팀"}
             </div>
             <p className="text-xs text-neutral-500 mb-4 leading-relaxed">
-              {matchedAuthor?.bio || "한국AI교육일보 종합 편집국 취재팀입니다."}
+              {matchedAuthor?.bio || "한국AI교육신문 종합 편집국 취재팀입니다."}
             </p>
 
             {/* Reporter's Hot Articles Box */}
@@ -478,123 +326,19 @@ export default function ArticleView({
             </div>
           </div>
 
-          {/* Action Bar (좋아요 & 뉴스댓글) */}
-          <div className="flex items-center gap-3 py-4 border-y border-neutral-200 my-8 font-sans">
-            <button
-              onClick={handleLike}
-              className="flex items-center gap-1.5 text-xs font-bold text-neutral-700 hover:text-rose-600 transition px-4 py-2 rounded border border-neutral-200 hover:border-rose-300 bg-white cursor-pointer"
-              id="btn-article-like"
-            >
-              <Heart className="h-4 w-4 text-rose-500 fill-rose-500" />
-              <span>좋아요 {likeCount}</span>
-            </button>
-
-            <button
-              onClick={() => setShowComments(!showComments)}
-              className="flex items-center gap-1.5 text-xs font-bold text-neutral-700 hover:text-sky-700 transition px-4 py-2 rounded border border-neutral-200 hover:border-sky-300 bg-white cursor-pointer"
-              id="btn-article-comments-toggle"
-            >
-              <MessageSquare className="h-4 w-4 text-sky-600" />
-              <span>독자의 목소리</span>
-            </button>
+          {/* Action Bar (좋아요) */}
+          <div className="flex flex-wrap items-center justify-between gap-3 py-4 border-y border-neutral-200 my-8 font-sans">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleLike}
+                className="flex items-center gap-1.5 text-xs font-bold text-neutral-700 hover:text-rose-600 transition px-4 py-2 rounded border border-neutral-200 hover:border-rose-300 bg-white cursor-pointer shadow-2xs"
+                id="btn-article-like"
+              >
+                <Heart className="h-4 w-4 text-rose-500 fill-rose-500" />
+                <span>좋아요 {likeCount}</span>
+              </button>
+            </div>
           </div>
-
-          {/* Toggleable Public Comments & Submission Segment */}
-          {showComments && (
-            <section className="bg-white border border-neutral-200 rounded-lg p-5 mb-8 font-sans shadow-xs text-left" id="comments-section">
-              <div className="flex justify-between items-center pb-3 border-b border-neutral-200 mb-4">
-                <h3 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4 text-sky-600" />
-                  <span>독자의 목소리</span>
-                </h3>
-              </div>
-
-              {/* Comments List */}
-              <div className="space-y-3 mb-6">
-                {approvedComments.length === 0 ? (
-                  <div className="text-center py-6 bg-neutral-50 rounded-md border border-dashed border-neutral-200 text-neutral-400 text-xs">
-                    게시된 독자 댓글이 아직 없습니다. 첫 의견을 남겨주세요.
-                  </div>
-                ) : (
-                  approvedComments.map((comm) => (
-                    <div key={comm.id} className="p-3.5 bg-neutral-50/80 rounded-md border border-neutral-200/80">
-                      <div className="flex justify-between items-center mb-1.5">
-                        <span className="text-xs font-bold text-neutral-800">{comm.authorName}</span>
-                        <span className="text-[10px] text-neutral-400 font-mono">
-                          {new Date(comm.createdAt).toLocaleString()}
-                        </span>
-                      </div>
-                      <p className="text-xs text-neutral-700 leading-relaxed whitespace-pre-wrap">{comm.content}</p>
-                    </div>
-                  ))
-                )}
-              </div>
-
-              {/* Comment Submission Form */}
-              <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-200/80">
-                <h4 className="text-xs font-bold text-neutral-800 mb-2 flex items-center gap-1.5">
-                  <Send className="h-3.5 w-3.5 text-sky-600" />
-                  <span>새 댓글 작성하기</span>
-                </h4>
-
-                {commentSubmitted && (
-                  <div className="mb-3 p-3 bg-emerald-50 border border-emerald-200 rounded text-xs text-emerald-800 flex items-center gap-2 font-medium">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                    <span>댓글이 등록되었습니다.</span>
-                  </div>
-                )}
-
-                <form onSubmit={handleCommentSubmit} className="space-y-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-[11px] font-bold text-neutral-600 mb-1">작성자 성명 *</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="이름 또는 닉네임"
-                        value={commentName}
-                        onChange={(e) => setCommentName(e.target.value)}
-                        className="w-full text-xs p-2 bg-white border border-neutral-300 rounded focus:outline-none focus:border-sky-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-bold text-neutral-600 mb-1">이메일 (선택)</label>
-                      <input
-                        type="email"
-                        placeholder="reader@example.com"
-                        value={commentEmail}
-                        onChange={(e) => setCommentEmail(e.target.value)}
-                        className="w-full text-xs p-2 bg-white border border-neutral-300 rounded focus:outline-none focus:border-sky-500"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-bold text-neutral-600 mb-1">의견 내용 *</label>
-                    <textarea
-                      required
-                      rows={3}
-                      maxLength={500}
-                      placeholder="기사에 대한 의견을 남겨주세요."
-                      value={commentText}
-                      onChange={(e) => setCommentText(e.target.value)}
-                      className="w-full text-xs p-2 bg-white border border-neutral-300 rounded focus:outline-none focus:border-sky-500 resize-none"
-                    />
-                  </div>
-
-                  <div className="flex justify-end pt-1">
-                    <button
-                      type="submit"
-                      className="w-full sm:w-auto px-5 py-2 bg-sky-700 hover:bg-sky-800 text-white font-bold text-xs rounded transition flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-xs"
-                    >
-                      <Send className="h-3.5 w-3.5" />
-                      <span>댓글 등록</span>
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </section>
-          )}
 
           {/* FAQ Accordion section (strictly matching "FAQ 자동 생성, Meta, Schema, FAQ") */}
           {article.faqList && article.faqList.length > 0 && (

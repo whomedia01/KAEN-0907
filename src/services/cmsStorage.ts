@@ -14,8 +14,9 @@ import {
   addAuditLogToSupabase,
   seedSupabaseIfEmpty
 } from "../lib/supabaseService";
+import { matchArticleImage, createInlineFigureHtml } from "../data/pressImages";
 
-const STORAGE_KEY = "kaen_cms_db_v2";
+const STORAGE_KEY = "kaen_cms_db_v3";
 
 // Helper to ensure article content length >= 1000 characters
 export function ensureArticleLength(content: string): string {
@@ -26,11 +27,11 @@ export function ensureArticleLength(content: string): string {
   }
 
   const factCheckSupplement = `
-<h3>■ [한국AI교육일보 팩트체크 센터 심층 분석]</h3>
+<h3>■ [한국AI교육신문 팩트체크 센터 심층 분석]</h3>
 <p>본 언론사 팩트체크 수석 취재팀은 이번 보도 주제와 관련하여 전국 17개 시·도교육청 스마트 교육 담당관 및 학교 교원 500명을 대상으로 다각도 성과 모니터링을 실시했습니다. 실증 데이터 분석 결과, 인공지능 디지털 기술의 정밀한 현장 안착은 학생들의 학업 성취도 격차를 줄이고 공교육에 대한 독자와 학부모의 신뢰도를 크게 상향시킨 것으로 분석되었습니다.</p>
 <p>교육 전문가들은 디지털 기술 도입 시 교사의 수업 자율권 및 평가 전문성을 확고히 보장하는 동시에, 유소년 학생들의 개인정보 보호 및 저작권 준수 지침을 엄격히 강화해야 한다고 권고하고 있습니다.</p>
 <p>아울러 농어촌 및 도서 벽지 학교의 디지털 교육 접근성 강화를 위한 국가 차원의 균형 예산 투입과 전 국민 대상 AI 리터러시 연수가 연계되어야 합니다. 본 언론사는 사실성에 기초한 정론직필 보도로 대한민국 공교육 혁신에 기여할 것입니다.</p>
-<p class="text-xs text-gray-500 border-t border-gray-200 pt-2.5 mt-5"><strong>[저작권 및 언론 윤리 준수 안내]</strong> 본 기사는 공공 언론 가이드라인 및 저작권법 제28조(정당한 범위 내 인용)를 엄격히 준수하여 정부 보도자료 및 현장 성과 데이터를 바탕으로 작성되었습니다. 한국AI교육일보의 무단 전재 및 복제를 금합니다.</p>
+<p class="text-xs text-gray-500 border-t border-gray-200 pt-2.5 mt-5"><strong>[저작권 및 언론 윤리 준수 안내]</strong> 본 기사는 공공 언론 가이드라인 및 저작권법 제28조(정당한 범위 내 인용)를 엄격히 준수하여 정부 보도자료 및 현장 성과 데이터를 바탕으로 작성되었습니다. 한국AI교육신문의 무단 전재 및 복제를 금합니다.</p>
 `;
 
   let result = content + factCheckSupplement;
@@ -115,7 +116,7 @@ export async function generateAiArticle(topic?: string, categoryName?: string, k
           }
         }
       });
-      const prompt = `당신은 대한민국 대표 인공지능·미래교육 전문 언론사 '한국AI교육일보'의 수석 에디터이자 기자입니다.
+      const prompt = `당신은 대한민국 대표 인공지능·미래교육 전문 언론사 '한국AI교육신문'의 수석 에디터이자 기자입니다.
 주제: ${topic || "AI 디지털 교과서와 미래 학교 수업의 변화"}
 카테고리: ${categoryName || "AI·미래교육"}
 핵심 키워드: ${keywords || "AI교육, 에듀테크, 맞춤형학습"}
@@ -138,7 +139,7 @@ export async function generateAiArticle(topic?: string, categoryName?: string, k
 {
   "title": "대괄호나 날짜 말머리가 없는 간결하고 전문적인 보도 헤드라인",
   "excerpt": "기사 요약 (2~3문장, ~밝혔다/전했다 보도체 문체)",
-  "content": "<p><strong>[한국AI교육일보 = 취재팀]</strong> 본문 첫 단락...</p><h3>■ 소제목 1</h3><p>상세 본문 단락 1...</p>",
+  "content": "<p><strong>[한국AI교육신문 = 취재팀]</strong> 본문 첫 단락...</p><h3>■ 소제목 1</h3><p>상세 본문 단락 1...</p>",
   "tags": ["키워드1", "키워드2"],
   "faqList": [{ "q": "질문 1", "a": "답변 1" }]
 }`;
@@ -172,7 +173,7 @@ export async function generateAiArticle(topic?: string, categoryName?: string, k
   const generatedExcerpt = `정부 및 교육 현장의 최신 데이터에 기반한 ${safeTopic} 성과 및 진단 보고서가 발표됐다.`;
 
   let generatedContent = `
-<p><strong>[한국AI교육일보 = 취재팀]</strong> ${safeCategory} 분야의 핵심 이슈인 '${safeTopic}'에 대한 전국 공교육 현장 및 전문가 종합 분석 결과가 공개됐다.</p>
+<p><strong>[한국AI교육신문 = 취재팀]</strong> ${safeCategory} 분야의 핵심 이슈인 '${safeTopic}'에 대한 전국 공교육 현장 및 전문가 종합 분석 결과가 공개됐다.</p>
 <p>이번 현장 실태 조사 및 데이터 분석 결과에 따르면, 최근 도입된 인공지능(AI) 기반 학습 체계와 맞춤형 디지털 솔루션은 학생들의 자발적 학습 참여도 향상과 과목별 성취도 격차 해소에 실질적인 기여를 하고 있는 것으로 밝혀졌다.</p>
 
 <h3>■ 현장 적용 실태 및 팩트 데이터 점검</h3>
@@ -224,18 +225,31 @@ export async function executeAutomatedPublishing(manualTrigger = false, targetCa
   const selectedTopic = topics[Math.floor(Math.random() * topics.length)];
   const generated = await generateAiArticle(selectedTopic, categoryName, `${categoryName}, 팩트검증, 24H분산발행, AI교육`);
 
+  // 기사 내용 및 카테고리에 최적화된 고유 보도사진 매칭
+  const existingUrls = new Set<string>(db.articles.map((a: any) => a.imageUrl).filter(Boolean));
+  const matchedImage = matchArticleImage(generated.title, generated.content, categoryId, existingUrls);
+  const inlineFigure = createInlineFigureHtml(matchedImage);
+  
+  let finalContent = generated.content;
+  if (finalContent && !finalContent.includes('<figure')) {
+    if (finalContent.includes('</h3>')) {
+      const parts = finalContent.split('</h3>');
+      finalContent = parts[0] + '</h3>' + inlineFigure + parts.slice(1).join('</h3>');
+    }
+  }
+
   const now = new Date();
   const newArticle = {
     id: "art_auto_" + Date.now(),
     slug: "auto-" + Date.now(),
     title: generated.title,
-    content: generated.content,
+    content: finalContent,
     excerpt: generated.excerpt,
     categoryId: categoryId,
     authorId: "auth_policy",
-    imageUrl: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=800",
-    imageCaption: "한국AI교육일보 24시간 분산 자동 송출 시스템에 의해 팩트 검증을 완료한 교육 현장 보도사진.",
-    imageCopyright: "한국AI교육일보 DB",
+    imageUrl: matchedImage.url,
+    imageCaption: matchedImage.caption,
+    imageCopyright: matchedImage.copyright,
     status: "published",
     scheduledAt: null,
     createdAt: now.toISOString(),

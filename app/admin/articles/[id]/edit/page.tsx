@@ -1,0 +1,1 @@
+export default function EditArticlePage() { return <div><h1 className="text-3xl font-black text-brand-navy">기사 수정</h1><p className="mt-4 text-gray-600">MVP Step 2에서 상세 수정 폼을 구현하세요. 현재는 새 기사 작성과 목록 조회가 준비되어 있습니다.</p></div>; }

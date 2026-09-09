@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   LayoutDashboard,
   FileText,
@@ -25,7 +25,8 @@ import {
   RefreshCw,
   Search,
   BookOpen,
-  Clock
+  Clock,
+  Save
 } from "lucide-react";
 import {
   Article,
@@ -41,6 +42,7 @@ import {
   AutomationSettings,
   AutomationLog
 } from "../types";
+import { PRESS_IMAGE_DATABASE, matchArticleImage, createInlineFigureHtml, PressImageItem } from "../data/pressImages";
 
 
 interface AdminPanelProps {
@@ -65,6 +67,31 @@ const getNoSpaceCharCount = (htmlOrText: string) => {
   const text = htmlOrText.replace(/<[^>]*>/g, '');
   return text.replace(/\s+/g, '').length;
 };
+
+export interface EditorDraftData {
+  title: string;
+  content: string;
+  excerpt: string;
+  categoryId: string;
+  authorId: string;
+  status: 'draft' | 'scheduled' | 'published';
+  scheduledAt: string;
+  imageUrl: string;
+  imageCaption: string;
+  imageCopyright: string;
+  tagsString: string;
+  isHero: boolean;
+  isOpinion: boolean;
+  isPhoto: boolean;
+  videoUrl: string;
+  faqList: FAQItem[];
+  changeReason: string;
+  editorMode: 'create' | 'edit';
+  selectedArticleId: string | null;
+  savedAt: string;
+}
+
+const DRAFT_STORAGE_KEY = "kaen_cms_editor_auto_draft_v1";
 
 export default function AdminPanel({
   articles,
@@ -256,6 +283,211 @@ export default function AdminPanel({
   const [gitCommitOnSave, setGitCommitOnSave] = useState(true);
   const [changeReason, setChangeReason] = useState("");
 
+  // LocalStorage Auto-Draft states
+  const [availableDraft, setAvailableDraft] = useState<EditorDraftData | null>(null);
+  const [lastDraftSavedTime, setLastDraftSavedTime] = useState<string | null>(null);
+  const [draftToast, setDraftToast] = useState<string | null>(null);
+  const [isDraftSaving, setIsDraftSaving] = useState(false);
+  const isUserInputOccurred = useRef(false);
+  const [isDraftBannerDismissed, setIsDraftBannerDismissed] = useState(false);
+
+  // Check available draft from localStorage
+  const checkStoredDraft = () => {
+    try {
+      const stored = localStorage.getItem(DRAFT_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored) as EditorDraftData;
+        if (parsed && (parsed.title || parsed.content)) {
+          setAvailableDraft(parsed);
+          setLastDraftSavedTime(new Date(parsed.savedAt).toLocaleTimeString());
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to check stored draft", e);
+    }
+    setAvailableDraft(null);
+    return null;
+  };
+
+  useEffect(() => {
+    checkStoredDraft();
+  }, []);
+
+  // When switching to editor tab, re-check stored draft and reset dismissed state
+  useEffect(() => {
+    if (activeTab === 'editor') {
+      checkStoredDraft();
+      setIsDraftBannerDismissed(false);
+    }
+  }, [activeTab]);
+
+  // Auto save draft to localStorage on content change (debounced 600ms)
+  useEffect(() => {
+    if (activeTab !== 'editor') return;
+    if (!isUserInputOccurred.current) return;
+
+    // Only save if there is title or content
+    if (!editTitle.trim() && !editContent.trim()) return;
+
+    const timer = setTimeout(() => {
+      try {
+        setIsDraftSaving(true);
+        const draft: EditorDraftData = {
+          title: editTitle,
+          content: editContent,
+          excerpt: editExcerpt,
+          categoryId: editCategoryId,
+          authorId: editAuthorId,
+          status: editStatus,
+          scheduledAt: editScheduledAt,
+          imageUrl: editImageUrl,
+          imageCaption: editCaption,
+          imageCopyright: editCopyright,
+          tagsString: editTagsString,
+          isHero: editIsHero,
+          isOpinion: editIsOpinion,
+          isPhoto: editIsPhoto,
+          videoUrl: editVideoUrl,
+          faqList: editFaqList,
+          changeReason,
+          editorMode,
+          selectedArticleId,
+          savedAt: new Date().toISOString()
+        };
+        localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
+        setAvailableDraft(draft);
+        const timeStr = new Date().toLocaleTimeString();
+        setLastDraftSavedTime(timeStr);
+        setTimeout(() => setIsDraftSaving(false), 800);
+      } catch (err) {
+        console.warn("Auto save draft failed", err);
+        setIsDraftSaving(false);
+      }
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [
+    activeTab,
+    editTitle,
+    editContent,
+    editExcerpt,
+    editCategoryId,
+    editAuthorId,
+    editStatus,
+    editScheduledAt,
+    editImageUrl,
+    editCaption,
+    editCopyright,
+    editTagsString,
+    editIsHero,
+    editIsOpinion,
+    editIsPhoto,
+    editVideoUrl,
+    editFaqList,
+    changeReason,
+    editorMode,
+    selectedArticleId
+  ]);
+
+  // Load draft from localStorage
+  const handleLoadDraft = () => {
+    const draft = availableDraft || checkStoredDraft();
+    if (!draft) {
+      alert("불러올 수 있는 임시 저장본이 없습니다.");
+      return;
+    }
+
+    if (editTitle || editContent) {
+      const confirmMsg = `[작성 중이던 내용 불러오기]\n\n저장 시각: ${new Date(draft.savedAt).toLocaleString()}\n제목: "${draft.title || '(제목 없음)'}"\n\n임시 저장된 내용을 현재 편집기에 불러오시겠습니까?\n현재 입력된 내용은 덮어쓰여집니다.`;
+      if (!window.confirm(confirmMsg)) {
+        return;
+      }
+    }
+
+    setEditTitle(draft.title || "");
+    setEditContent(draft.content || "");
+    setEditExcerpt(draft.excerpt || "");
+    if (draft.categoryId) setEditCategoryId(draft.categoryId);
+    if (draft.authorId) setEditAuthorId(draft.authorId);
+    if (draft.status) setEditStatus(draft.status);
+    setEditScheduledAt(draft.scheduledAt || "");
+    setEditImageUrl(draft.imageUrl || "");
+    setEditCaption(draft.imageCaption || "");
+    setEditCopyright(draft.imageCopyright || "");
+    setEditTagsString(draft.tagsString || "");
+    setEditIsHero(!!draft.isHero);
+    setEditIsOpinion(!!draft.isOpinion);
+    setEditIsPhoto(!!draft.isPhoto);
+    setEditVideoUrl(draft.videoUrl || "");
+    if (Array.isArray(draft.faqList)) setEditFaqList(draft.faqList);
+    setChangeReason(draft.changeReason || "");
+    if (draft.editorMode) setEditorMode(draft.editorMode);
+    setSelectedArticleId(draft.selectedArticleId || null);
+
+    isUserInputOccurred.current = true;
+    setIsDraftBannerDismissed(true);
+    setDraftToast(`[불러오기 완료] ${new Date(draft.savedAt).toLocaleTimeString()}에 저장된 초안을 성공적으로 복원했습니다.`);
+    setTimeout(() => setDraftToast(null), 4000);
+  };
+
+  // Discard draft
+  const handleDiscardDraft = () => {
+    if (!window.confirm("로컬 스토리지에 임시 저장된 기사 초안을 완전히 삭제하시겠습니까?")) return;
+    try {
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+      setAvailableDraft(null);
+      setLastDraftSavedTime(null);
+      setIsDraftBannerDismissed(true);
+      setDraftToast("임시 저장본이 정상적으로 삭제되었습니다.");
+      setTimeout(() => setDraftToast(null), 3000);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Manual save draft now
+  const handleManualSaveDraft = () => {
+    try {
+      setIsDraftSaving(true);
+      isUserInputOccurred.current = true;
+      const draft: EditorDraftData = {
+        title: editTitle,
+        content: editContent,
+        excerpt: editExcerpt,
+        categoryId: editCategoryId,
+        authorId: editAuthorId,
+        status: editStatus,
+        scheduledAt: editScheduledAt,
+        imageUrl: editImageUrl,
+        imageCaption: editCaption,
+        imageCopyright: editCopyright,
+        tagsString: editTagsString,
+        isHero: editIsHero,
+        isOpinion: editIsOpinion,
+        isPhoto: editIsPhoto,
+        videoUrl: editVideoUrl,
+        faqList: editFaqList,
+        changeReason,
+        editorMode,
+        selectedArticleId,
+        savedAt: new Date().toISOString()
+      };
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
+      setAvailableDraft(draft);
+      const timeStr = new Date().toLocaleTimeString();
+      setLastDraftSavedTime(timeStr);
+      setDraftToast(`현재 작성 내용이 로컬 스토리지에 즉시 임시 저장되었습니다. (${timeStr})`);
+      setTimeout(() => {
+        setIsDraftSaving(false);
+        setDraftToast(null);
+      }, 3000);
+    } catch (err) {
+      console.warn("Manual save draft failed", err);
+      setIsDraftSaving(false);
+    }
+  };
+
   // Revision comparison states
   const [diffArticleId, setDiffArticleId] = useState<string>("");
   const [diffRevId1, setDiffRevId1] = useState("");
@@ -266,7 +498,7 @@ export default function AdminPanel({
   const [mediaFile, setMediaFile] = useState<string | null>(null);
   const [mediaFileName, setMediaFileName] = useState("");
   const [mediaCaption, setMediaCaption] = useState("");
-  const [mediaCopyright, setMediaCopyright] = useState(siteSetting.newspaperName || "한국AI교육일보");
+  const [mediaCopyright, setMediaCopyright] = useState(siteSetting.newspaperName || "한국AI교육신문");
   const [mediaSource, setMediaSource] = useState("신문사 라이브러리 직접 기획 촬영");
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
 
@@ -287,12 +519,14 @@ export default function AdminPanel({
   const [categoryFilter, setCategoryFilter] = useState("");
 
   // Legal Information Form states
-  const [settCompanyName, setSettCompanyName] = useState(siteSetting.companyName || "㈜후미디어");
+  const [settCompanyName, setSettCompanyName] = useState(siteSetting.companyName || "(주)후미디어");
   const [settRepresentative, setSettRepresentative] = useState(siteSetting.representative);
   const [settBizNo, setSettBizNo] = useState(siteSetting.businessLicenseNo);
+  const [settRegistrationNo, setSettRegistrationNo] = useState(siteSetting.registrationNo || "");
+  const [settRegistrationDate, setSettRegistrationDate] = useState(siteSetting.registrationDate || "");
   const [settAddress, setSettAddress] = useState(siteSetting.address);
   const [settPhone, setSettPhone] = useState(siteSetting.phone);
-  const [settFax, setSettFax] = useState(siteSetting.fax || "02-6443-4230");
+  const [settFax, setSettFax] = useState(siteSetting.fax || "02-6443-4223");
   const [settEmail, setSettEmail] = useState(siteSetting.email);
   const [settYouthOfficer, setSettYouthOfficer] = useState(siteSetting.youthOfficer);
   const [settGrievanceOfficer, setSettGrievanceOfficer] = useState(siteSetting.grievanceOfficer || "황광성");
@@ -309,6 +543,51 @@ export default function AdminPanel({
   // Deploy simulation logs
   const [deployLogs, setDeployLogs] = useState<string[]>([]);
   const [isDeploying, setIsDeploying] = useState(false);
+
+  // Press Photo Library Picker & Matching states
+  const [isPressImageModalOpen, setIsPressImageModalOpen] = useState(false);
+  const [pressImageCategoryFilter, setPressImageCategoryFilter] = useState("all");
+  const [pressImageSearchQuery, setPressImageSearchQuery] = useState("");
+  const [pressImageModalAction, setPressImageModalAction] = useState<'thumbnail' | 'inline'>('thumbnail');
+  const [imageToastMessage, setImageToastMessage] = useState<string | null>(null);
+
+  // Auto match image based on article title, content, category
+  const handleAutoMatchImage = () => {
+    const existingUrls = new Set<string>(
+      articles.filter(a => a.id !== selectedArticleId).map(a => a.imageUrl).filter(Boolean)
+    );
+    const matched = matchArticleImage(editTitle, editContent, editCategoryId, existingUrls);
+    isUserInputOccurred.current = true;
+    setEditImageUrl(matched.url);
+    setEditCaption(matched.caption);
+    setEditCopyright(matched.copyright);
+    setImageToastMessage(`✅ 기사 내용 분석 완료: '${matched.title}' 보도사진 및 캡션이 대표 사진으로 자동 설정되었습니다.`);
+    setTimeout(() => setImageToastMessage(null), 4000);
+  };
+
+  // Open modal for either thumbnail or inline insertion
+  const handleOpenPressImageModal = (action: 'thumbnail' | 'inline') => {
+    setPressImageModalAction(action);
+    setPressImageCategoryFilter(editCategoryId || "all");
+    setIsPressImageModalOpen(true);
+  };
+
+  // Select image from modal
+  const handleSelectPressImage = (img: PressImageItem) => {
+    isUserInputOccurred.current = true;
+    if (pressImageModalAction === 'thumbnail') {
+      setEditImageUrl(img.url);
+      setEditCaption(img.caption);
+      setEditCopyright(img.copyright);
+      setImageToastMessage(`✅ 대표 사진 설정: '${img.title}' 적용 완료`);
+    } else {
+      const inlineFigure = createInlineFigureHtml(img);
+      setEditContent((prev) => prev + inlineFigure);
+      setImageToastMessage(`✅ 본문 사진 삽입: '${img.title}' 본문 하단에 삽입 완료`);
+    }
+    setIsPressImageModalOpen(false);
+    setTimeout(() => setImageToastMessage(null), 3000);
+  };
 
   // Check permissions based on RBAC
   const hasPermission = (action: 'write' | 'moderate' | 'admin') => {
@@ -328,6 +607,7 @@ export default function AdminPanel({
 
   // Seed editor fields
   const handleEditArticleInit = (art: Article) => {
+    isUserInputOccurred.current = false;
     setSelectedArticleId(art.id);
     setEditorMode('edit');
     setEditTitle(art.title);
@@ -348,31 +628,38 @@ export default function AdminPanel({
     setEditFaqList(art.faqList || []);
     setChangeReason("");
     setActiveTab('editor');
+    checkStoredDraft();
+    setIsDraftBannerDismissed(false);
   };
 
   const handleCreateArticleInit = () => {
+    isUserInputOccurred.current = false;
     setSelectedArticleId(null);
     setEditorMode('create');
     setEditTitle("");
-    setEditContent(`<p><strong>[한국AI교육일보 = 취재팀]</strong> 교육부와 과기정통부, 전국 17개 시·도교육청이 미래 교육 생태계 조성을 위한 AI 디지털 혁신 종합 기본계획을 수립하고 본격적인 실증 사업에 돌입했다.</p>
+    setEditContent(`<p><strong>[한국AI교육신문 = 취재팀]</strong> 교육부와 과기정통부, 전국 17개 시·도교육청이 미래 교육 생태계 조성을 위한 AI 디지털 혁신 종합 기본계획을 수립하고 본격적인 실증 사업에 돌입했다.</p>
 <h3>■ 첨단 디지털 인프라 구축 및 1인 1스마트기기 지원</h3>
+<figure class="my-6 p-2 bg-neutral-50 border border-neutral-200 rounded text-center">
+  <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&q=80&w=1200" alt="스마트교실 수업 현장" class="w-full h-auto max-h-96 object-cover rounded shadow-sm mx-auto" referrerPolicy="no-referrer" />
+  <figcaption class="text-xs text-neutral-600 mt-2 font-medium">▲ [보도사진] 초등학교 스마트 교실에서 학생들이 1인 1디지털 기기로 AI 디지털 교과서 맞춤형 수업에 몰입하고 있다. (출처: 한국AI교육신문 DB)</figcaption>
+</figure>
 <p>이번 종합계획에 따라 전국 초·중·고교 학생들을 대상으로 맞춤형 디지털 학습 기기가 100% 보급되며, 학내 초고속 무선망(WiFi 6E) 인프라 구축이 완료된다. 특히 도서 벽지 및 농어촌 지역 학교에 우선적으로 예산을 배정하여 디지털 정보 격차를 해소한다.</p>
 <p>또한 학생 데이터 보안 강화를 위해 국가 국가암호모듈 검증을 필한 공공 사설 클라우드가 전면 가동되며, 개인정보 유출을 차단하는 24시간 실시간 보안 모니터링 체계가 운영된다.</p>
 <h3>■ 교원 전문성 강화 및 AI 튜터 맞춤 코칭</h3>
 <p>현장 교원 10만 명을 대상으로 생성형 AI 수업 활용법, 프롬프트 지도 기술, AI 윤리 가이드라인을 다루는 실습형 연수가 상시 가동된다. AI 튜터 알고리즘은 학생의 학습 이력과 오답 반응 패턴을 정밀 진단하여 1대1 수준별 문제 풀이 및 시각 보조 자료를 즉각 제시한다.</p>
 <p>시범학교 운영 결과, 하위권 학생들의 기초학력 미달 비율이 35% 감소하는 등 실질적인 학습 진전 성과를 거두었다. 현장 교사들은 단순 지식 전달에서 벗어나 학생들과 정서적 교감을 나누는 인지적 코치 역할을 전담하게 된다.</p>
 <h3>■ 팩트 기반 데이터 검증 및 언론 윤리 준수</h3>
-<p>한국AI교육일보 팩트체크 센터는 이번 보도 내용과 관련하여 실증 통계 자료를 다각도로 검증했으며, 저작권법 제28조 및 언론 윤리 강령을 엄격히 준수하여 정론직필 보도를 이어나갈 예정이다.</p>
-<p class="text-xs text-gray-500 border-t border-gray-200 pt-2.5 mt-5"><strong>[저작권 및 언론 윤리 준수 안내]</strong> 본 기사는 공공 언론 가이드라인 및 저작권법 제28조(정당한 범위 내 인용)를 엄격히 준수하여 정부 보도자료 및 현장 성과 데이터를 바탕으로 작성되었습니다. 한국AI교육일보의 무단 전재 및 복제를 금합니다.</p>`);
+<p>한국AI교육신문 팩트체크 센터는 이번 보도 내용과 관련하여 실증 통계 자료를 다각도로 검증했으며, 저작권법 제28조 및 언론 윤리 강령을 엄격히 준수하여 정론직필 보도를 이어나갈 예정이다.</p>
+<p class="text-xs text-gray-500 border-t border-gray-200 pt-2.5 mt-5"><strong>[저작권 및 언론 윤리 준수 안내]</strong> 본 기사는 공공 언론 가이드라인 및 저작권법 제28조(정당한 범위 내 인용)를 엄격히 준수하여 정부 보도자료 및 현장 성과 데이터를 바탕으로 작성되었습니다. 한국AI교육신문의 무단 전재 및 복제를 금합니다.</p>`);
     setEditExcerpt("");
     setEditCategoryId(categories[0]?.id || "");
     setEditAuthorId(authors[0]?.id || "");
     setEditStatus('published');
     setEditScheduledAt("");
-    setEditImageUrl("https://picsum.photos/seed/default_banner/800/600");
-    setEditCaption("현장 보도를 풍성하게 이끄는 교육 에듀테크 상징 도표");
-    setEditCopyright((siteSetting.newspaperName || "한국AI교육일보") + " 제공");
-    setEditTagsString("교육, 미래트렌드");
+    setEditImageUrl("https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=1200");
+    setEditCaption("정부서울청사 브리핑룸에서 열린 AI 공교육 종합 정책 발표 현장.");
+    setEditCopyright((siteSetting.newspaperName || "한국AI교육신문") + " DB");
+    setEditTagsString("교육부, AI교육기본계획, 스마트교실, 디지털교과서");
     setEditIsHero(false);
     setEditIsOpinion(false);
     setEditIsPhoto(false);
@@ -382,6 +669,8 @@ export default function AdminPanel({
     ]);
     setChangeReason("");
     setActiveTab('editor');
+    checkStoredDraft();
+    setIsDraftBannerDismissed(false);
   };
 
   // Save Article
@@ -447,6 +736,16 @@ export default function AdminPanel({
 
       const data = await response.json();
       if (response.ok) {
+        // Clean up auto-saved draft upon successful publication
+        try {
+          localStorage.removeItem(DRAFT_STORAGE_KEY);
+          setAvailableDraft(null);
+          setLastDraftSavedTime(null);
+          isUserInputOccurred.current = false;
+        } catch (e) {
+          console.warn("Failed to clear draft after save", e);
+        }
+
         setDeployLogs((prev) => [
           ...prev,
           `[Durable Database] Database state committed successfully.`,
@@ -718,6 +1017,8 @@ export default function AdminPanel({
           companyName: settCompanyName,
           representative: settRepresentative,
           businessLicenseNo: settBizNo,
+          registrationNo: settRegistrationNo,
+          registrationDate: settRegistrationDate,
           address: settAddress,
           phone: settPhone,
           fax: settFax,
@@ -1010,7 +1311,7 @@ ${testData.message || "정상 수신 완료"}`;
           </div>
           <div>
             <h1 className="text-xl font-bold font-bareun-batang tracking-tight text-white flex items-center gap-2">
-              {siteSetting.newspaperName || "한국AI교육일보"} <span className="text-amber-500 text-xs font-mono font-bold bg-neutral-800 px-2 py-0.5 rounded font-sans">관리 시스템</span>
+              {siteSetting.newspaperName || "한국AI교육신문"} <span className="text-amber-500 text-xs font-mono font-bold bg-neutral-800 px-2 py-0.5 rounded font-sans">관리 시스템</span>
             </h1>
             <p className="text-[10px] text-neutral-400">뉴스 및 신문사 모바일/PC 통합 관리 시스템</p>
           </div>
@@ -1193,11 +1494,11 @@ ${testData.message || "정상 수신 완료"}`;
                   <p className="text-[9px] text-emerald-500 mt-1">▲ 모든 뉴스가 원활히 작성되고 있습니다</p>
                 </div>
                 <div className="bg-neutral-950 p-4 rounded-lg border border-neutral-800">
-                  <span className="text-[10px] text-neutral-400 font-bold block mb-1">독자들이 읽은 전체 기사 수 (조회수)</span>
-                  <div className="text-2xl font-bold font-mono text-amber-500">
-                    {articles.reduce((acc, a) => acc + a.viewCount, 0).toLocaleString()}회
+                  <span className="text-[10px] text-neutral-400 font-bold block mb-1">발행 완료 기사 수</span>
+                  <div className="text-2xl font-bold font-mono text-emerald-500">
+                    {articles.filter((a) => a.status === 'published').length}건
                   </div>
-                  <p className="text-[9px] text-neutral-400 mt-1">독자 관심도가 꾸준히 상승하고 있습니다</p>
+                  <p className="text-[9px] text-neutral-400 mt-1">정론직필 보도가 정상 송출 중입니다</p>
                 </div>
                 <div className="bg-neutral-950 p-4 rounded-lg border border-neutral-800">
                   <span className="text-[10px] text-neutral-400 font-bold block mb-1">승인 대기 중인 독자 댓글</span>
@@ -1307,12 +1608,27 @@ ${testData.message || "정상 수신 완료"}`;
             <div className="space-y-4" id="view-articles-list">
               <div className="flex flex-col sm:flex-row gap-3 justify-between items-center mb-2">
                 <h2 className="text-base font-bold font-serif text-white">전체 기사 목록 관리</h2>
-                <button
-                  onClick={handleCreateArticleInit}
-                  className="bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs py-2 px-4 rounded transition flex items-center gap-1.5"
-                >
-                  <PlusCircle className="h-4 w-4" /> 새 기사 작성하기
-                </button>
+                <div className="flex items-center gap-2">
+                  {availableDraft && (
+                    <button
+                      onClick={() => {
+                        handleLoadDraft();
+                        setActiveTab('editor');
+                      }}
+                      className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold py-2 px-3 rounded transition flex items-center gap-1.5 cursor-pointer"
+                      title={`${new Date(availableDraft.savedAt).toLocaleTimeString()}에 임시 저장된 글 불러오기`}
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                      <span>작성 중이던 내용 불러오기</span>
+                    </button>
+                  )}
+                  <button
+                    onClick={handleCreateArticleInit}
+                    className="bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs py-2 px-4 rounded transition flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <PlusCircle className="h-4 w-4" /> 새 기사 작성하기
+                  </button>
+                </div>
               </div>
 
               {/* Filters */}
@@ -1352,7 +1668,6 @@ ${testData.message || "정상 수신 완료"}`;
                         <th className="p-3">기사 제목</th>
                         <th className="p-3">작성자</th>
                         <th className="p-3">글자 수 (공백 제외)</th>
-                        <th className="p-3">읽은 횟수</th>
                         <th className="p-3">작성 일자</th>
                         <th className="p-3">발행 상태</th>
                         <th className="p-3 text-right">관리 기능</th>
@@ -1383,7 +1698,6 @@ ${testData.message || "정상 수신 완료"}`;
                                 {charCount.toLocaleString()}자
                               </span>
                             </td>
-                            <td className="p-3 font-mono text-amber-500">{art.viewCount.toLocaleString()}</td>
                             <td className="p-3 text-neutral-400">{new Date(art.createdAt).toLocaleDateString()}</td>
                             <td className="p-3">
                               <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
@@ -1420,31 +1734,148 @@ ${testData.message || "정상 수신 완료"}`;
           {/* TAB 3: EDITOR - 기사 작성 및 수정 */}
           {activeTab === 'editor' && (
             <form onSubmit={handleSaveArticle} className="space-y-6" id="view-article-editor">
-              <div className="flex justify-between items-center border-b border-neutral-800 pb-3 mb-4">
-                <h2 className="text-base font-serif font-bold text-white flex items-center gap-1.5">
-                  <FileText className="h-4.5 w-4.5 text-amber-500 animate-spin-slow" />
-                  <span>{editorMode === 'create' ? "새 기사 작성하기" : "기사 내용 수정하기"}</span>
-                </h2>
-                <div className="flex items-center space-x-2">
-                  <span className="text-xs text-neutral-400">작성 방식:</span>
+              {/* Draft Status Feedback Toast */}
+              {draftToast && (
+                <div className="bg-emerald-950/80 border border-emerald-500/50 text-emerald-200 text-xs px-4 py-2.5 rounded-lg flex items-center justify-between shadow-md animate-fade-in">
+                  <div className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-emerald-400" />
+                    <span>{draftToast}</span>
+                  </div>
                   <button
                     type="button"
-                    onClick={() => setEditorFormatMode('wysiwyg')}
-                    className={`px-2.5 py-1 rounded text-[11px] font-bold transition ${
-                      editorFormatMode === 'wysiwyg' ? "bg-amber-500 text-neutral-950" : "bg-neutral-800 text-neutral-300"
-                    }`}
+                    onClick={() => setDraftToast(null)}
+                    className="text-emerald-400 hover:text-white text-xs cursor-pointer p-1"
                   >
-                    쉬운 편집기 (기본)
+                    <X className="h-3.5 w-3.5" />
                   </button>
+                </div>
+              )}
+
+              {/* Stored Draft Recovery Banner */}
+              {availableDraft && !isDraftBannerDismissed && (
+                <div className="bg-gradient-to-r from-amber-950/70 via-neutral-900 to-amber-950/40 border border-amber-500/50 rounded-lg p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+                  <div className="flex items-start sm:items-center gap-2.5">
+                    <div className="p-2 bg-amber-500/20 rounded border border-amber-500/40 text-amber-400 mt-0.5 sm:mt-0 flex-shrink-0">
+                      <RotateCcw className="h-4 w-4 animate-spin-slow" />
+                    </div>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-xs font-bold text-amber-300">작성 중이던 임시 저장 글이 보관되어 있습니다</span>
+                        <span className="bg-amber-500/20 text-amber-300 text-[10px] font-mono px-2 py-0.5 rounded border border-amber-500/30">
+                          {new Date(availableDraft.savedAt).toLocaleDateString()} {new Date(availableDraft.savedAt).toLocaleTimeString()} 저장됨
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-neutral-300 line-clamp-1 mt-1">
+                        제목: <span className="text-white font-medium">"{availableDraft.title || '(제목 없음)'}"</span> &nbsp;|&nbsp; 
+                        본문 분량: 공백 제외 약 {getNoSpaceCharCount(availableDraft.content).toLocaleString()}자
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 w-full sm:w-auto justify-end flex-shrink-0">
+                    <button
+                      type="button"
+                      onClick={handleLoadDraft}
+                      className="bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs px-3.5 py-2 rounded transition flex items-center gap-1.5 shadow cursor-pointer"
+                      id="btn-load-draft-banner"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                      <span>작성 중이던 내용 불러오기</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDiscardDraft}
+                      className="bg-neutral-800 hover:bg-rose-950 hover:text-rose-300 text-neutral-400 text-xs px-2.5 py-2 rounded border border-neutral-700 hover:border-rose-800 transition flex items-center gap-1 cursor-pointer"
+                      title="임시 저장본 삭제"
+                      id="btn-discard-draft-banner"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      <span className="hidden md:inline">초안 삭제</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsDraftBannerDismissed(true)}
+                      className="text-neutral-400 hover:text-neutral-200 p-1.5 cursor-pointer"
+                      title="배너 닫기"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Editor Header & Control Bar */}
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-neutral-800 pb-3 mb-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-serif font-bold text-white flex items-center gap-1.5">
+                    <FileText className="h-4.5 w-4.5 text-amber-500 animate-spin-slow" />
+                    <span>{editorMode === 'create' ? "새 기사 작성하기" : "기사 내용 수정하기"}</span>
+                  </h2>
+
+                  {/* Auto-Draft Status Badge */}
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-neutral-900 border border-neutral-800 text-[11px]">
+                    <span className={`w-2 h-2 rounded-full ${isDraftSaving ? "bg-amber-400 animate-ping" : "bg-emerald-500"}`} />
+                    <span className="text-neutral-400">
+                      {isDraftSaving
+                        ? "로컬 저장 중..."
+                        : lastDraftSavedTime
+                        ? `임시 저장됨 (${lastDraftSavedTime})`
+                        : "자동 임시 저장 대기"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Draft Load Button in Toolbar */}
                   <button
                     type="button"
-                    onClick={() => setEditorFormatMode('markdown')}
-                    className={`px-2.5 py-1 rounded text-[11px] font-bold transition ${
-                      editorFormatMode === 'markdown' ? "bg-amber-500 text-neutral-950" : "bg-neutral-800 text-neutral-300"
+                    onClick={handleLoadDraft}
+                    className={`px-3 py-1.5 rounded text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                      availableDraft
+                        ? "bg-amber-500/20 text-amber-300 border border-amber-500/50 hover:bg-amber-500/30"
+                        : "bg-neutral-800 text-neutral-500 border border-neutral-700 opacity-60 cursor-not-allowed"
                     }`}
+                    title={availableDraft ? `${new Date(availableDraft.savedAt).toLocaleTimeString()} 저장된 임시 내용 불러오기` : "저장된 초안이 없습니다"}
+                    id="btn-load-draft-toolbar"
                   >
-                    원문 코드 편집기
+                    <RotateCcw className="h-3.5 w-3.5" />
+                    <span>작성 중이던 내용 불러오기</span>
                   </button>
+
+                  {/* Manual Save Draft Button */}
+                  <button
+                    type="button"
+                    onClick={handleManualSaveDraft}
+                    className="px-2.5 py-1.5 rounded text-xs font-medium bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border border-neutral-700 hover:text-white transition flex items-center gap-1 cursor-pointer"
+                    title="지금 즉시 로컬 스토리지에 임시 저장"
+                    id="btn-manual-save-draft"
+                  >
+                    <Save className="h-3.5 w-3.5" />
+                    <span>지금 임시 저장</span>
+                  </button>
+
+                  <div className="h-4 w-px bg-neutral-800 mx-1 hidden sm:block" />
+
+                  <div className="flex items-center space-x-1">
+                    <span className="text-xs text-neutral-400 mr-1 hidden sm:inline">작성 방식:</span>
+                    <button
+                      type="button"
+                      onClick={() => setEditorFormatMode('wysiwyg')}
+                      className={`px-2.5 py-1 rounded text-[11px] font-bold transition ${
+                        editorFormatMode === 'wysiwyg' ? "bg-amber-500 text-neutral-950" : "bg-neutral-800 text-neutral-300 hover:text-white"
+                      }`}
+                    >
+                      쉬운 편집기 (기본)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditorFormatMode('markdown')}
+                      className={`px-2.5 py-1 rounded text-[11px] font-bold transition ${
+                        editorFormatMode === 'markdown' ? "bg-amber-500 text-neutral-950" : "bg-neutral-800 text-neutral-300 hover:text-white"
+                      }`}
+                    >
+                      원문 코드 편집기
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -1458,7 +1889,10 @@ ${testData.message || "정상 수신 완료"}`;
                       type="text"
                       placeholder="독자의 눈길을 사로잡는 명확한 기사 제목을 입력해 주세요..."
                       value={editTitle}
-                      onChange={(e) => setEditTitle(e.target.value)}
+                      onChange={(e) => {
+                        isUserInputOccurred.current = true;
+                        setEditTitle(e.target.value);
+                      }}
                       className="w-full bg-neutral-950 border border-neutral-800 rounded p-2.5 text-xs text-white focus:ring-1 focus:ring-amber-500 outline-none"
                       required
                     />
@@ -1470,43 +1904,60 @@ ${testData.message || "정상 수신 완료"}`;
                       <div className="bg-neutral-900 border border-neutral-800 rounded-t p-2 flex flex-wrap gap-1.5 border-b-0 items-center">
                         <button
                           type="button"
-                          onClick={() => setEditContent((prev) => prev + "<h2>소제목 기입</h2>")}
-                          className="bg-neutral-800 hover:bg-neutral-700 text-[10px] font-mono px-2 py-1 rounded font-bold text-neutral-300"
+                          onClick={() => {
+                            isUserInputOccurred.current = true;
+                            setEditContent((prev) => prev + "<h2>소제목 기입</h2>");
+                          }}
+                          className="bg-neutral-800 hover:bg-neutral-700 text-[10px] font-mono px-2 py-1 rounded font-bold text-neutral-300 cursor-pointer"
                         >
                           소제목 추가
                         </button>
                         <button
                           type="button"
-                          onClick={() => setEditContent((prev) => prev + "<blockquote>\"인용구 내용을 기입하세요.\" - 출처 전문가</blockquote>")}
-                          className="bg-neutral-800 hover:bg-neutral-700 text-[10px] font-mono px-2 py-1 rounded font-bold text-neutral-300"
+                          onClick={() => {
+                            isUserInputOccurred.current = true;
+                            setEditContent((prev) => prev + "<blockquote>\"인용구 내용을 기입하세요.\" - 출처 전문가</blockquote>");
+                          }}
+                          className="bg-neutral-800 hover:bg-neutral-700 text-[10px] font-mono px-2 py-1 rounded font-bold text-neutral-300 cursor-pointer"
                         >
                           인용구 추가
                         </button>
                         <button
                           type="button"
-                          onClick={() => setEditContent((prev) => prev + "<ul><li>항목 1</li><li>항목 2</li></ul>")}
-                          className="bg-neutral-800 hover:bg-neutral-700 text-[10px] font-mono px-2 py-1 rounded font-bold text-neutral-300"
+                          onClick={() => {
+                            isUserInputOccurred.current = true;
+                            setEditContent((prev) => prev + "<ul><li>항목 1</li><li>항목 2</li></ul>");
+                          }}
+                          className="bg-neutral-800 hover:bg-neutral-700 text-[10px] font-mono px-2 py-1 rounded font-bold text-neutral-300 cursor-pointer"
                         >
                           목록 만들기
                         </button>
                         <button
                           type="button"
-                          onClick={() => setEditContent((prev) => prev + `<figure><img src="https://picsum.photos/seed/chart/800/500" alt="도표" referrerPolicy="no-referrer"/><figcaption>사진 및 통계 요약 캡션</figcaption></figure>`)}
-                          className="bg-neutral-800 hover:bg-neutral-700 text-[10px] font-mono px-2 py-1 rounded font-bold text-neutral-300"
+                          onClick={() => handleOpenPressImageModal('inline')}
+                          className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-mono px-2 py-1 rounded font-bold cursor-pointer flex items-center gap-1"
+                          title="기사 내용과 일치하는 보도사진을 선택하여 본문에 삽입합니다"
                         >
-                          사진 넣기
+                          <Image className="h-3 w-3" />
+                          <span>기사 맞춤 보도사진 넣기</span>
                         </button>
                         <button
                           type="button"
-                          onClick={() => setEditContent((prev) => prev + `<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>`)}
-                          className="bg-neutral-800 hover:bg-neutral-700 text-[10px] font-mono px-2 py-1 rounded font-bold text-neutral-300"
+                          onClick={() => {
+                            isUserInputOccurred.current = true;
+                            setEditContent((prev) => prev + `<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>`);
+                          }}
+                          className="bg-neutral-800 hover:bg-neutral-700 text-[10px] font-mono px-2 py-1 rounded font-bold text-neutral-300 cursor-pointer"
                         >
                           유튜브 동영상 넣기
                         </button>
                         <button
                           type="button"
-                          onClick={() => setEditContent((prev) => prev + `<table><thead><tr><th>헤더1</th><th>헤더2</th></tr></thead><tbody><tr><td>셀1</td><td>셀2</td></tr></tbody></table>`)}
-                          className="bg-neutral-800 hover:bg-neutral-700 text-[10px] font-mono px-2 py-1 rounded font-bold text-neutral-300"
+                          onClick={() => {
+                            isUserInputOccurred.current = true;
+                            setEditContent((prev) => prev + `<table><thead><tr><th>헤더1</th><th>헤더2</th></tr></thead><tbody><tr><td>셀1</td><td>셀2</td></tr></tbody></table>`);
+                          }}
+                          className="bg-neutral-800 hover:bg-neutral-700 text-[10px] font-mono px-2 py-1 rounded font-bold text-neutral-300 cursor-pointer"
                         >
                           표(도표) 넣기
                         </button>
@@ -1538,7 +1989,8 @@ ${testData.message || "정상 수신 완료"}`;
                           <button
                             type="button"
                             onClick={() => {
-                              const extraSection = `\n<h3>■ [한국AI교육일보 팩트체크 센터 심층 분석]</h3>\n<p>본 언론사 팩트체크 수석 취재팀은 이번 보도 주제와 관련하여 전국 17개 시·도교육청 스마트 교육 담당관 및 학교 교원 500명을 대상으로 다각도 성과 모니터링을 실시했습니다. 실증 데이터 분석 결과, 인공지능 디지털 기술의 정밀한 현장 안착은 학생들의 학업 성취도 격차를 줄이고 공교육에 대한 독자와 학부모의 신뢰도를 크게 상향시킨 것으로 분석되었습니다.</p>\n<p>교육 전문가들은 디지털 기술 도입 시 교사의 수업 자율권 및 평가 전문성을 확고히 보장하는 동시에, 유소년 학생들의 개인정보 보호 및 저작권 준수 지침을 엄격히 강화해야 한다고 권고하고 있습니다.</p>\n<p>아울러 농어촌 및 도서 벽지 학교의 디지털 교육 접근성 강화를 위한 국가 차원의 균형 예산 투입과 전 국민 대상 AI 리터러시 연수가 연계되어야 합니다. 본 언론사는 사실성에 기초한 정론직필 보도로 대한민국 공교육 혁신에 기여할 것입니다.</p>`;
+                              isUserInputOccurred.current = true;
+                              const extraSection = `\n<h3>■ [한국AI교육신문 팩트체크 센터 심층 분석]</h3>\n<p>본 언론사 팩트체크 수석 취재팀은 이번 보도 주제와 관련하여 전국 17개 시·도교육청 스마트 교육 담당관 및 학교 교원 500명을 대상으로 다각도 성과 모니터링을 실시했습니다. 실증 데이터 분석 결과, 인공지능 디지털 기술의 정밀한 현장 안착은 학생들의 학업 성취도 격차를 줄이고 공교육에 대한 독자와 학부모의 신뢰도를 크게 상향시킨 것으로 분석되었습니다.</p>\n<p>교육 전문가들은 디지털 기술 도입 시 교사의 수업 자율권 및 평가 전문성을 확고히 보장하는 동시에, 유소년 학생들의 개인정보 보호 및 저작권 준수 지침을 엄격히 강화해야 한다고 권고하고 있습니다.</p>\n<p>아울러 농어촌 및 도서 벽지 학교의 디지털 교육 접근성 강화를 위한 국가 차원의 균형 예산 투입과 전 국민 대상 AI 리터러시 연수가 연계되어야 합니다. 본 언론사는 사실성에 기초한 정론직필 보도로 대한민국 공교육 혁신에 기여할 것입니다.</p>`;
                               if (editContent.includes('legal-disclaimer') || editContent.includes('[저작권 및 언론 윤리 준수 안내]')) {
                                 const parts = editContent.split('<p class="text-xs text-gray-500');
                                 setEditContent(parts[0] + extraSection + '\n<p class="text-xs text-gray-500' + parts.slice(1).join('<p class="text-xs text-gray-500'));
@@ -1546,7 +1998,7 @@ ${testData.message || "정상 수신 완료"}`;
                                 setEditContent((prev) => prev + extraSection);
                               }
                             }}
-                            className="mt-2 sm:mt-0 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-bold px-2.5 py-1 rounded transition flex items-center gap-1"
+                            className="mt-2 sm:mt-0 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-bold px-2.5 py-1 rounded transition flex items-center gap-1 cursor-pointer"
                           >
                             <Sparkles className="h-3 w-3" />
                             <span>✨ AI로 기사 분량 자동으로 채우기</span>
@@ -1556,7 +2008,10 @@ ${testData.message || "정상 수신 완료"}`;
 
                       <textarea
                         value={editContent}
-                        onChange={(e) => setEditContent(e.target.value)}
+                        onChange={(e) => {
+                          isUserInputOccurred.current = true;
+                          setEditContent(e.target.value);
+                        }}
                         placeholder="기사 본문 내용을 자유롭게 작성해 주세요..."
                         className="w-full bg-neutral-950 border border-neutral-800 rounded-b p-3 h-96 text-xs font-mono text-white focus:ring-1 focus:ring-amber-500 outline-none"
                         required
@@ -1566,7 +2021,10 @@ ${testData.message || "정상 수신 완료"}`;
                     <div>
                       <textarea
                         value={editContent}
-                        onChange={(e) => setEditContent(e.target.value)}
+                        onChange={(e) => {
+                          isUserInputOccurred.current = true;
+                          setEditContent(e.target.value);
+                        }}
                         placeholder="마크다운(Markdown) 원문 기법을 활용해 기사 내용을 작성해 주세요..."
                         className="w-full bg-neutral-950 border border-neutral-800 rounded p-3 h-96 text-xs font-mono text-white focus:ring-1 focus:ring-amber-500 outline-none"
                         required
@@ -1579,7 +2037,10 @@ ${testData.message || "정상 수신 완료"}`;
                     <textarea
                       placeholder="기사 상단과 목록에 보여질 2~3줄 분량의 핵심 요약글을 적어주세요..."
                       value={editExcerpt}
-                      onChange={(e) => setEditExcerpt(e.target.value)}
+                      onChange={(e) => {
+                        isUserInputOccurred.current = true;
+                        setEditExcerpt(e.target.value);
+                      }}
                       className="w-full bg-neutral-950 border border-neutral-800 rounded p-2.5 text-xs text-white focus:ring-1 focus:ring-amber-500 outline-none h-20"
                     />
                   </div>
@@ -1743,14 +2204,66 @@ ${testData.message || "정상 수신 완료"}`;
                   </div>
 
                   <div className="bg-neutral-950 p-4 rounded-lg border border-neutral-800 space-y-3">
-                    <h3 className="text-xs font-bold text-white border-b border-neutral-800 pb-2">대표 사진 및 출처 설정</h3>
+                    <div className="flex items-center justify-between border-b border-neutral-800 pb-2">
+                      <h3 className="text-xs font-bold text-white flex items-center gap-1.5">
+                        <Image className="h-3.5 w-3.5 text-amber-500" />
+                        <span>대표 사진(썸네일) 및 출처 설정</span>
+                      </h3>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={handleAutoMatchImage}
+                          className="bg-amber-500 hover:bg-amber-400 text-neutral-950 text-[10px] font-bold px-2 py-1 rounded transition flex items-center gap-1 cursor-pointer shadow-sm"
+                          title="기사의 제목과 본문 내용을 분석하여 가장 일치하는 보도사진과 캡션을 자동 설정합니다"
+                        >
+                          <Sparkles className="h-3 w-3" />
+                          <span>기사 내용 맞춤 자동 매칭</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenPressImageModal('thumbnail')}
+                          className="bg-neutral-800 hover:bg-neutral-700 text-amber-300 border border-neutral-700 text-[10px] font-bold px-2 py-1 rounded transition flex items-center gap-1 cursor-pointer"
+                        >
+                          <BookOpen className="h-3 w-3" />
+                          <span>보도사진 아카이브</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {imageToastMessage && (
+                      <div className="bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] p-2 rounded flex items-center gap-1.5 animate-fade-in">
+                        <Check className="h-3.5 w-3.5 text-amber-400 flex-shrink-0" />
+                        <span>{imageToastMessage}</span>
+                      </div>
+                    )}
+
+                    {/* Image Preview Box */}
+                    {editImageUrl && (
+                      <div className="relative rounded overflow-hidden border border-neutral-800 bg-neutral-900 aspect-video max-h-48 group">
+                        <img
+                          src={editImageUrl}
+                          alt="대표 사진 미리보기"
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2.5">
+                          <p className="text-[11px] text-white font-medium line-clamp-1">
+                            {editCaption || "사진 설명(캡션)을 입력해 주세요"}
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
                     <div>
                       <label className="text-[11px] text-neutral-400 block mb-1">대표 사진 인터넷 주소 (URL)</label>
                       <input
                         type="text"
                         value={editImageUrl}
-                        onChange={(e) => setEditImageUrl(e.target.value)}
+                        onChange={(e) => {
+                          isUserInputOccurred.current = true;
+                          setEditImageUrl(e.target.value);
+                        }}
+                        placeholder="https://..."
                         className="w-full bg-neutral-900 border border-neutral-800 rounded p-2 text-xs text-white outline-none font-mono"
                       />
                     </div>
@@ -1760,7 +2273,11 @@ ${testData.message || "정상 수신 완료"}`;
                       <input
                         type="text"
                         value={editCaption}
-                        onChange={(e) => setEditCaption(e.target.value)}
+                        onChange={(e) => {
+                          isUserInputOccurred.current = true;
+                          setEditCaption(e.target.value);
+                        }}
+                        placeholder="기사 맥락에 맞는 구체적인 현장 설명..."
                         className="w-full bg-neutral-900 border border-neutral-800 rounded p-2 text-xs text-white outline-none"
                       />
                     </div>
@@ -1807,7 +2324,7 @@ ${testData.message || "정상 수신 완료"}`;
                           </button>
                           <button
                             type="button"
-                            onClick={() => setEditCopyright("한국AI교육일보 취재팀")}
+                            onClick={() => setEditCopyright("한국AI교육신문 취재팀")}
                             className="text-[10px] bg-neutral-900 hover:bg-neutral-800 text-neutral-300 border border-neutral-800 px-2 py-0.5 rounded transition"
                           >
                             📸 현장 취재 사진
@@ -2014,9 +2531,9 @@ ${testData.message || "정상 수신 완료"}`;
                   <div className="bg-neutral-900/90 border border-neutral-800 p-2.5 rounded text-[11px] space-y-1">
                     <p className="font-bold text-amber-300 flex items-center gap-1">📸 현장 취재 보도 사진</p>
                     <p className="text-[10px] text-neutral-400 leading-normal">
-                      한국AI교육일보 취재팀 및 객원기자가 현장에서 직접 촬영한 독자 보도 사진.
+                      한국AI교육신문 취재팀 및 객원기자가 현장에서 직접 촬영한 독자 보도 사진.
                     </p>
-                    <p className="text-[9px] text-amber-500/80 font-mono">표기 예: 한국AI교육일보 취재팀</p>
+                    <p className="text-[9px] text-amber-500/80 font-mono">표기 예: 한국AI교육신문 취재팀</p>
                   </div>
                 </div>
               </div>
@@ -2589,6 +3106,30 @@ ${testData.message || "정상 수신 완료"}`;
                       className="w-full bg-neutral-900 border border-neutral-850 rounded p-2 text-xs text-white"
                     />
                   </div>
+                  <div>
+                    <label className="text-[11px] text-neutral-400 block mb-1">
+                      인터넷신문 등록번호 <span className="text-neutral-500 text-[10px]">(미발급 시 공란 유지)</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="공란 또는 등록번호 (예: 서울 아 00000)"
+                      value={settRegistrationNo}
+                      onChange={(e) => setSettRegistrationNo(e.target.value)}
+                      className="w-full bg-neutral-900 border border-neutral-850 rounded p-2 text-xs text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] text-neutral-400 block mb-1">
+                      등록연월일 <span className="text-neutral-500 text-[10px]">(미발급 시 공란 유지)</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="공란 또는 등록일자 (예: 2026.08.01)"
+                      value={settRegistrationDate}
+                      onChange={(e) => setSettRegistrationDate(e.target.value)}
+                      className="w-full bg-neutral-900 border border-neutral-850 rounded p-2 text-xs text-white"
+                    />
+                  </div>
                   <div className="sm:col-span-2">
                     <label className="text-[11px] text-neutral-400 block mb-1">사무실 주소</label>
                     <input
@@ -3072,6 +3613,197 @@ ${testData.message || "정상 수신 완료"}`;
                       )}
                     </tbody>
                   </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Press Image Archive Picker Modal */}
+          {isPressImageModalOpen && (
+            <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-neutral-900 border border-neutral-800 rounded-xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-fade-in">
+                {/* Modal Header */}
+                <div className="p-4 border-b border-neutral-800 flex items-center justify-between bg-neutral-950">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                      <Image className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                        <span>보도사진 아카이브 라이브러리</span>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          {pressImageModalAction === 'thumbnail' ? '대표 사진(썸네일) 선택 모드' : '본문 인라인 사진 삽입 모드'}
+                        </span>
+                      </h3>
+                      <p className="text-[11px] text-neutral-400">
+                        기사 주제 및 단락 내용과 정확히 일치하는 고품질 언론 보도사진을 선택하세요.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsPressImageModalOpen(false)}
+                    className="text-neutral-400 hover:text-white p-1.5 rounded-lg hover:bg-neutral-800 transition"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+
+                {/* Filter and Search Bar */}
+                <div className="p-4 border-b border-neutral-800 bg-neutral-900/80 flex flex-col sm:flex-row gap-3 items-center justify-between">
+                  <div className="flex flex-wrap gap-1.5 w-full sm:w-auto">
+                    <button
+                      type="button"
+                      onClick={() => setPressImageCategoryFilter("all")}
+                      className={`text-xs px-2.5 py-1 rounded-full font-medium transition cursor-pointer ${
+                        pressImageCategoryFilter === "all"
+                          ? "bg-amber-500 text-neutral-950 font-bold"
+                          : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+                      }`}
+                    >
+                      전체 ({PRESS_IMAGE_DATABASE.length})
+                    </button>
+                    {categories.map((c) => {
+                      const count = PRESS_IMAGE_DATABASE.filter(img => img.category === c.id).length;
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => setPressImageCategoryFilter(c.id)}
+                          className={`text-xs px-2.5 py-1 rounded-full font-medium transition cursor-pointer ${
+                            pressImageCategoryFilter === c.id
+                              ? "bg-amber-500 text-neutral-950 font-bold"
+                              : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+                          }`}
+                        >
+                          {c.name} ({count})
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="relative w-full sm:w-64">
+                    <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-neutral-500" />
+                    <input
+                      type="text"
+                      placeholder="사진 제목, 키워드 검색..."
+                      value={pressImageSearchQuery}
+                      onChange={(e) => setPressImageSearchQuery(e.target.value)}
+                      className="w-full bg-neutral-950 border border-neutral-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white outline-none focus:border-amber-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Body Content / Grid */}
+                <div className="p-4 overflow-y-auto space-y-4 flex-1">
+                  {/* Top Content Analysis Recommendation */}
+                  {(() => {
+                    const recommended = matchArticleImage(editTitle, editContent, editCategoryId);
+                    return (
+                      <div className="bg-gradient-to-r from-amber-950/40 via-neutral-900 to-neutral-900 border border-amber-500/40 rounded-xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={recommended.url}
+                            alt={recommended.title}
+                            className="w-24 h-16 object-cover rounded-lg border border-amber-500/40 shadow-sm flex-shrink-0"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] bg-amber-500 text-neutral-950 font-bold px-1.5 py-0.5 rounded">
+                                ✨ 기사 내용 분석 최고 매칭 추천
+                              </span>
+                              <span className="text-xs font-bold text-white">{recommended.title}</span>
+                            </div>
+                            <p className="text-[11px] text-neutral-300 line-clamp-1 mt-1">
+                              {recommended.caption}
+                            </p>
+                            <p className="text-[10px] text-neutral-400 font-mono mt-0.5">
+                              출처: {recommended.copyright}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleSelectPressImage(recommended)}
+                          className="bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-bold px-3 py-1.5 rounded-lg transition whitespace-nowrap cursor-pointer shadow flex-shrink-0"
+                        >
+                          {pressImageModalAction === 'thumbnail' ? '이 사진을 대표 썸네일로 지정' : '본문에 이 사진 삽입하기'}
+                        </button>
+                      </div>
+                    );
+                  })()}
+
+                  {/* All Image Items Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {PRESS_IMAGE_DATABASE
+                      .filter((img) => {
+                        const matchCat = pressImageCategoryFilter === "all" || img.category === pressImageCategoryFilter;
+                        const matchSearch =
+                          !pressImageSearchQuery ||
+                          img.title.toLowerCase().includes(pressImageSearchQuery.toLowerCase()) ||
+                          img.caption.toLowerCase().includes(pressImageSearchQuery.toLowerCase()) ||
+                          img.keywords.some((k) => k.toLowerCase().includes(pressImageSearchQuery.toLowerCase()));
+                        return matchCat && matchSearch;
+                      })
+                      .map((img) => (
+                        <div
+                          key={img.id}
+                          className="bg-neutral-950 border border-neutral-800 rounded-lg overflow-hidden flex flex-col hover:border-amber-500/50 transition group"
+                        >
+                          <div className="relative aspect-video overflow-hidden bg-neutral-900">
+                            <img
+                              src={img.url}
+                              alt={img.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                              referrerPolicy="no-referrer"
+                            />
+                            <div className="absolute top-2 left-2">
+                              <span className="text-[9px] bg-black/70 backdrop-blur-sm text-neutral-200 px-1.5 py-0.5 rounded font-mono">
+                                {categories.find((c) => c.id === img.category)?.name || "보도사진"}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="p-3 flex flex-col justify-between flex-1 space-y-2">
+                            <div>
+                              <h4 className="text-xs font-bold text-white line-clamp-1">{img.title}</h4>
+                              <p className="text-[11px] text-neutral-400 line-clamp-2 mt-1 leading-relaxed">
+                                {img.caption}
+                              </p>
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {img.keywords.slice(0, 3).map((kw, i) => (
+                                  <span key={i} className="text-[9px] bg-neutral-900 text-neutral-400 px-1.5 py-0.5 rounded border border-neutral-800">
+                                    #{kw}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="pt-2 border-t border-neutral-900 flex items-center justify-between">
+                              <span className="text-[10px] text-neutral-500">{img.copyright}</span>
+                              <button
+                                type="button"
+                                onClick={() => handleSelectPressImage(img)}
+                                className="bg-neutral-800 hover:bg-amber-500 hover:text-neutral-950 text-neutral-200 text-[11px] font-bold px-2.5 py-1 rounded transition cursor-pointer"
+                              >
+                                {pressImageModalAction === 'thumbnail' ? '대표 사진 지정' : '본문 삽입'}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="p-3 border-t border-neutral-800 bg-neutral-950 flex items-center justify-between text-xs text-neutral-400">
+                  <span>총 {PRESS_IMAGE_DATABASE.length}개의 언론사 인증 보도사진이 등록되어 있습니다.</span>
+                  <button
+                    type="button"
+                    onClick={() => setIsPressImageModalOpen(false)}
+                    className="bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1 rounded cursor-pointer transition"
+                  >
+                    닫기
+                  </button>
                 </div>
               </div>
             </div>

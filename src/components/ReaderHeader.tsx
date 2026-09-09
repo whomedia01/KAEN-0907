@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, BookOpen, User, Settings, Type, Sparkles, X, Menu, ArrowRight, LogIn, LogOut, Check } from "lucide-react";
+import { Search, BookOpen, Type, Sparkles, X, Menu, ArrowRight } from "lucide-react";
 import { Category, Article } from "../types";
 
 interface ReaderHeaderProps {
@@ -8,14 +8,14 @@ interface ReaderHeaderProps {
   currentCategory: string | null;
   onSelectCategory: (catId: string | null) => void;
   onSelectArticle: (articleId: string | null) => void;
-  onOpenAdmin: () => void;
+  onOpenAdmin?: () => void;
   fontSize: number; // 1, 2, 3 representing small, medium, large
   setFontSize: (size: number) => void;
   readingMode: boolean;
   setReadingMode: (mode: boolean) => void;
   onSearch: (query: string) => void;
-  userRole: string;
-  setUserRole: (role: any) => void;
+  userRole?: string;
+  setUserRole?: (role: any) => void;
   onNavigatePage?: (page: string) => void;
 }
 
@@ -25,20 +25,16 @@ export default function ReaderHeader({
   currentCategory,
   onSelectCategory,
   onSelectArticle,
-  onOpenAdmin,
   fontSize,
   setFontSize,
   readingMode,
   setReadingMode,
   onSearch,
-  userRole,
-  setUserRole,
   onNavigatePage
 }: ReaderHeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,47 +86,8 @@ export default function ReaderHeader({
             <strong className="font-semibold text-gray-800">{getTodayString()}</strong>
           </div>
 
-          {/* Right: Essential Login/Admin Controls, Font Size & Search */}
+          {/* Right: Font Size & Search */}
           <div className="flex items-center gap-3 text-[12px] text-gray-700">
-            {userRole === "Viewer" ? (
-              <>
-                <button 
-                  onClick={() => setIsLoginModalOpen(true)} 
-                  className="hover:text-blue-600 cursor-pointer font-medium"
-                >
-                  로그인
-                </button>
-                <span className="text-gray-300">|</span>
-                <button 
-                  onClick={onOpenAdmin} 
-                  className="hover:text-blue-700 font-bold text-red-600 flex items-center gap-1 cursor-pointer" 
-                  id="btn-admin-console"
-                >
-                  <Settings className="h-3 w-3" />
-                  <span>관리자</span>
-                </button>
-              </>
-            ) : (
-              <>
-                <button 
-                  onClick={onOpenAdmin} 
-                  className="hover:text-blue-700 font-bold text-blue-900 flex items-center gap-1 cursor-pointer"
-                  id="btn-admin-console"
-                >
-                  <span className="inline-block w-2 h-2 bg-emerald-500 rounded-full"></span>
-                  <span>관리자</span>
-                </button>
-                <span className="text-gray-300">|</span>
-                <button 
-                  onClick={() => setUserRole('Viewer')} 
-                  className="hover:text-red-600 cursor-pointer"
-                >
-                  로그아웃
-                </button>
-              </>
-            )}
-            <span className="text-gray-300">|</span>
-
             {/* Font Size controls */}
             <div className="flex items-center gap-1">
               <button
@@ -208,7 +165,7 @@ export default function ReaderHeader({
       <header className="bg-white py-5 px-4 border-b border-gray-200">
         <div className="max-w-[1240px] mx-auto flex items-center justify-center">
           
-          {/* Center Logo: 한국AI교육일보 (Gmarket Sans, Bold, 크기 28px, 진한 네이비색 #112443) */}
+          {/* Center Logo: 한국AI교육신문 (Gmarket Sans, Bold, 크기 28px, 진한 네이비색 #112443) */}
           <div 
             className="text-center cursor-pointer select-none flex flex-col items-center justify-center py-1" 
             onClick={() => onSelectCategory(null)}
@@ -216,7 +173,7 @@ export default function ReaderHeader({
             <div className="flex items-center justify-center gap-2">
               <div className="text-center">
                 <h1 className="text-[30px] font-bold tracking-tight text-[#112443] font-bareun-batang">
-                  한국AI교육일보
+                  한국AI교육신문
                 </h1>
                 <p className="text-[11px] text-[#2563eb] font-bold tracking-wider font-pretendard uppercase -mt-1">
                   KOREA AI EDUCATION NEWS
@@ -309,10 +266,6 @@ export default function ReaderHeader({
           <button onClick={() => onSelectCategory("cat_literacy")} className="hover:text-blue-700 whitespace-nowrap cursor-pointer">
             AI 윤리·리터러시
           </button>
-          <span className="text-gray-300">|</span>
-          <button onClick={() => onSelectCategory("cat_opinion")} className="hover:text-blue-700 whitespace-nowrap cursor-pointer">
-            전문가 칼럼
-          </button>
         </div>
       </section>
 
@@ -378,7 +331,7 @@ export default function ReaderHeader({
               <div className="bg-[#112443] p-5 text-white flex justify-between items-center sticky top-0 z-20">
                 <div>
                   <h3 className="text-[11px] font-bold uppercase tracking-wider text-amber-300">KOREA AI EDUCATION NEWS</h3>
-                  <h2 className="text-lg font-black font-serif-kr">한국AI교육일보 전체 메뉴</h2>
+                  <h2 className="text-lg font-black font-serif-kr">한국AI교육신문 전체 메뉴</h2>
                 </div>
                 <button 
                   onClick={() => setMobileMenuOpen(false)}
@@ -475,12 +428,6 @@ export default function ReaderHeader({
                     >
                       AI 윤리·리터러시
                     </button>
-                    <button
-                      onClick={() => { onSelectCategory("cat_opinion"); setMobileMenuOpen(false); }}
-                      className="p-2.5 rounded bg-slate-50 hover:bg-blue-50 hover:text-blue-700 text-left border border-slate-200 transition cursor-pointer col-span-2"
-                    >
-                      전문가 칼럼 / 시론
-                    </button>
                   </div>
                 </div>
 
@@ -522,88 +469,6 @@ export default function ReaderHeader({
               </div>
             </div>
 
-            {/* Drawer Footer */}
-            <div className="p-5 bg-slate-50 border-t border-slate-200 text-xs text-slate-500 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-slate-700">신문사 모드: {userRole}</span>
-                <button
-                  onClick={() => {
-                    setIsLoginModalOpen(true);
-                    setMobileMenuOpen(false);
-                  }}
-                  className="text-blue-700 font-bold hover:underline cursor-pointer"
-                >
-                  로그인/권한변경
-                </button>
-              </div>
-              <button
-                onClick={() => {
-                  onOpenAdmin();
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full py-2 bg-slate-900 text-white font-bold rounded text-center block hover:bg-slate-800 transition cursor-pointer"
-              >
-                신문사 CMS 관리자 콘솔
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
-
-      {/* 6. Sleek Interactive Login & Role Selector Modal */}
-      {isLoginModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-sans animate-fade-in" id="login-modal-overlay">
-          <div className="bg-white rounded-md max-w-md w-full border border-slate-200 overflow-hidden shadow-2xl flex flex-col animate-scale-in text-left">
-            <div className="bg-[#112443] p-5 text-white flex justify-between items-center">
-              <div>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-yellow-300">한국AI교육일보 독자 포털</h3>
-                <h2 className="text-lg font-black font-serif-kr">신문사 회원 로그인 및 권한 선택</h2>
-              </div>
-              <button 
-                onClick={() => setIsLoginModalOpen(false)}
-                className="text-white/70 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="p-6 space-y-4">
-              <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
-                {[
-                  { role: 'Admin', title: '황광성 발행인 · 편집인 (Admin)' },
-                  { role: 'Editor', title: '편집국 취재팀 (Editor)' },
-                  { role: 'Viewer', title: '일반 방문 독자 (Viewer)' }
-                ].map((item) => (
-                  <button
-                    key={item.role}
-                    onClick={() => {
-                      setUserRole(item.role);
-                      setIsLoginModalOpen(false);
-                    }}
-                    className={`w-full border p-3 rounded text-left transition hover:border-slate-900 cursor-pointer flex items-center justify-between ${
-                      userRole === item.role ? 'border-slate-900 bg-slate-50 ring-2 ring-slate-900/5' : 'border-slate-200 hover:bg-slate-50/50'
-                    }`}
-                  >
-                    <span className="text-xs font-bold text-slate-900">{item.title}</span>
-                    {userRole === item.role && (
-                      <span className="bg-slate-900 text-white font-mono text-[8px] px-1.5 py-0.5 rounded-full font-black flex items-center gap-0.5">
-                        <Check className="h-2 w-2" /> ACTIVE
-                      </span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
-              <button
-                onClick={() => setIsLoginModalOpen(false)}
-                className="bg-slate-900 text-white font-bold text-xs py-2 px-5 rounded hover:bg-slate-800 transition cursor-pointer"
-              >
-                닫기
-              </button>
-            </div>
           </div>
         </div>
       )}

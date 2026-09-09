@@ -6,23 +6,26 @@ import FrontPage from "./components/FrontPage";
 import ArticleView from "./components/ArticleView";
 import AdminPanel from "./components/AdminPanel";
 import StaticPages from "./components/StaticPages";
+import SEOHead from "./components/SEOHead";
 import seedData from "../db_data.json";
 import { Article, Category, Author, Comment, Revision, MediaItem, SiteSetting, AuditLog, MainLayoutItem } from "./types";
 
 const defaultSiteSetting: SiteSetting = {
-  newspaperName: "한국AI교육일보",
-  companyName: "㈜후미디어",
+  newspaperName: "한국AI교육신문",
+  companyName: "(주)후미디어",
   representative: "황광성",
   businessLicenseNo: "119-86-25861",
-  address: "서울특별시 금천구 가산디지털2로 53 한라시그마밸리 1102호 ~ 1104호",
+  registrationNo: "",
+  registrationDate: "",
+  address: "서울특별시 금천구 가산디지털2로 53 (가산동) 한라시그마밸리 1102호 ~ 1104호",
   phone: "02-6443-4222",
-  fax: "02-6443-4230",
-  email: "whomedia6104@gmail.com",
-  youthOfficer: "황광성 (발행인·편집인)",
+  fax: "02-6443-4223",
+  email: "whomedia03@gmail.com",
+  youthOfficer: "황광성",
   grievanceOfficer: "황광성",
-  privacyPolicy: "한국AI교육일보은 이용자의 개인정보를 보호하며 관련 법령을 엄격히 준수합니다.",
-  termsOfService: "한국AI교육일보 서비스를 이용함에 있어 본 약관의 규정에 따릅니다.",
-  youthPolicy: "한국AI교육일보은 청소년이 유해한 환경으로부터 보호받을 수 있도록 청소년 보호 정책을 실시합니다.",
+  privacyPolicy: "한국AI교육신문은 이용자의 개인정보를 보호하며 관련 법령을 엄격히 준수합니다.",
+  termsOfService: "한국AI교육신문 서비스를 이용함에 있어 본 약관의 규정에 따릅니다.",
+  youthPolicy: "한국AI교육신문은 청소년이 유해한 환경으로부터 보호받을 수 있도록 청소년 보호 정책을 실시합니다.",
   correctionGuide: "기사 내용 중 오보나 정정이 필요한 사항은 편집국 이메일로 접수해 주시면 확인 후 조치합니다.",
   tipGuide: "인공지능 교육 현장 소식, 독자 제보, 보도자료를 상시 접수합니다.",
   logoUrl: "/logo.png",
@@ -53,11 +56,88 @@ export default function App() {
   const [userName, setUserName] = useState<string>("황광성 발행인");
   const [userId, setUserId] = useState<string>("auth_publisher");
 
+  // Check if current URL is the admin entry path (/adm or #adm)
+  const checkIsAdminPath = () => {
+    if (typeof window === "undefined") return false;
+    const path = window.location.pathname.toLowerCase();
+    const hash = window.location.hash.toLowerCase();
+    return path === "/adm" || path === "/adm/" || hash === "#adm" || hash === "#/adm";
+  };
+
   // Navigation Routing State
   // 'home' | 'article_detail' | 'admin' | static page types
-  const [currentPage, setCurrentPage] = useState<string>("home");
+  const [currentPage, setCurrentPage] = useState<string>(() => (checkIsAdminPath() ? "admin" : "home"));
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+
+  // Synchronize browser URL location for /adm access
+  useEffect(() => {
+    const handleUrlChange = () => {
+      if (checkIsAdminPath()) {
+        setCurrentPage("admin");
+      } else if (window.location.pathname === "/" && currentPage === "admin") {
+        setCurrentPage("home");
+      }
+    };
+
+    window.addEventListener("popstate", handleUrlChange);
+    window.addEventListener("hashchange", handleUrlChange);
+    return () => {
+      window.removeEventListener("popstate", handleUrlChange);
+      window.removeEventListener("hashchange", handleUrlChange);
+    };
+  }, [currentPage]);
+
+  // Dynamic SEO metadata computation for non-article views
+  const getPageSeoProps = () => {
+    const siteName = siteSetting?.newspaperName || "한국AI교육신문 (KAEN News)";
+    if (currentPage === "home") {
+      if (selectedCategoryId) {
+        const cat = categories.find((c) => c.id === selectedCategoryId);
+        return {
+          title: cat ? `${cat.name}` : siteName,
+          description: `${cat ? cat.name : "주요 뉴스"} - 대한민국 대표 인공지능 미래교육 전문지 실시간 보도`,
+          ogType: "website" as const
+        };
+      }
+      if (searchTerm) {
+        return {
+          title: `'${searchTerm}' 검색 결과`,
+          description: `'${searchTerm}' 관련 한국AI교육신문 보도 기사 검색 결과`,
+          ogType: "website" as const
+        };
+      }
+      return {
+        title: `${siteName} - 대한민국 대표 AI 공교육 정론직필`,
+        description: "대한민국 대표 인공지능·미래교육 전문지 한국AI교육신문 CMS 플랫폼 및 정론직필 언론사 뉴스 웹사이트",
+        ogType: "website" as const
+      };
+    }
+    if (currentPage === "admin") {
+      return {
+        title: `통합 CMS 종합편집국 관리센터`,
+        description: "한국AI교육신문 통합 기사 발행 및 편집 관리 시스템",
+        ogType: "website" as const
+      };
+    }
+    const staticTitles: Record<string, string> = {
+      about_company: "신문사 소개 및 발행인 인사말",
+      ethics_charter: "신문윤리강령 및 보도준칙",
+      reporters: "취재진 및 편집국 기자 소개",
+      tip_article: "독자 기사 제보 및 보도자료 접수",
+      correction: "정정보도 및 고충처리 청구",
+      terms_of_service: "이용약관",
+      privacy_policy: "개인정보처리방침",
+      youth_policy: "청소년보호정책",
+      rss_feed: "RSS 피드 서비스",
+      sitemap: "사이트맵"
+    };
+    return {
+      title: `${staticTitles[currentPage] || "안내"}`,
+      description: `${siteName} ${staticTitles[currentPage] || "안내"} 공식 페이지입니다.`,
+      ogType: "website" as const
+    };
+  };
 
   // Fetch all CMS data from full-stack Express API with resilient error boundaries
   const refreshAllData = async () => {
@@ -204,6 +284,15 @@ export default function App() {
   };
 
   const handleNavigatePage = (page: string) => {
+    if (page === "admin") {
+      if (typeof window !== "undefined" && window.location.pathname !== "/adm") {
+        window.history.pushState({}, "", "/adm");
+      }
+    } else {
+      if (typeof window !== "undefined" && (window.location.pathname === "/adm" || window.location.pathname === "/adm/")) {
+        window.history.pushState({}, "", "/");
+      }
+    }
     if (page === "home") {
       setSelectedArticleId(null);
     }
@@ -230,7 +319,12 @@ export default function App() {
         userName={userName}
         userId={userId}
         onRefreshAll={refreshAllData}
-        onClose={() => setCurrentPage("home")}
+        onClose={() => {
+          if (typeof window !== "undefined" && (window.location.pathname === "/adm" || window.location.pathname === "/adm/")) {
+            window.history.pushState({}, "", "/");
+          }
+          setCurrentPage("home");
+        }}
       />
     );
   }
@@ -246,19 +340,26 @@ export default function App() {
         currentCategory={selectedCategoryId}
         onSelectCategory={handleSelectCategory}
         onSelectArticle={handleSelectArticle}
-        onOpenAdmin={() => handleNavigatePage("admin")}
         fontSize={fontSize}
         setFontSize={setFontSize}
         readingMode={readingMode}
         setReadingMode={setReadingMode}
         onSearch={setSearchTerm}
-        userRole={userRole}
-        setUserRole={handleRoleShift}
         onNavigatePage={handleNavigatePage}
       />
 
       {/* Main Dynamic Viewport */}
       <div className="flex-grow">
+        {/* Dynamic SEO & OpenGraph Head Tag for non-article views */}
+        {currentPage !== "article_detail" && (
+          <SEOHead
+            title={getPageSeoProps().title}
+            description={getPageSeoProps().description}
+            ogType={getPageSeoProps().ogType}
+            siteSetting={siteSetting}
+          />
+        )}
+
         <AnimatePresence mode="wait">
           {currentPage === "home" && (
             <FrontPage
